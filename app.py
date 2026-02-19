@@ -122,8 +122,11 @@ def get_events_from_db():
                 SELECT e.*, u.username as created_by_username, u.full_name as created_by_name
                 FROM events e
                 LEFT JOIN users u ON e.created_by = u.id
-                WHERE e.status = 'active' AND e.event_date >= CURDATE()
-                ORDER BY e.event_date ASC
+                WHERE e.status = 'active' AND (
+                    e.event_date > CURDATE() OR 
+                    (e.event_date = CURDATE() AND e.event_time > CURTIME())
+                )
+                ORDER BY e.event_date ASC, e.event_time ASC
             """)
             events = cursor.fetchall()
             formatted_events = []
@@ -872,8 +875,11 @@ def analytics_api():
                 SELECT e.*, u.username as created_by_username, u.full_name as created_by_name
                 FROM events e
                 LEFT JOIN users u ON e.created_by = u.id
-                WHERE e.status = 'active' AND e.event_date >= CURDATE()
-                ORDER BY e.event_date ASC
+                WHERE e.status = 'active' AND (
+                    e.event_date > CURDATE() OR 
+                    (e.event_date = CURDATE() AND e.event_time > CURTIME())
+                )
+                ORDER BY e.event_date ASC, e.event_time ASC
             """)
             events = cursor.fetchall()
             cursor.execute("SELECT id, username, email, full_name, role, created_at FROM users ORDER BY created_at DESC")
@@ -1084,8 +1090,8 @@ def update_user_statistics(user_id):
                 SELECT 
                     COUNT(*) as total_bookings,
                     COALESCE(SUM(total_price), 0) as total_spent,
-                    COUNT(CASE WHEN e.event_date >= CURDATE() THEN 1 END) as upcoming_bookings,
-                    COUNT(CASE WHEN e.event_date < CURDATE() THEN 1 END) as past_bookings,
+                    COUNT(CASE WHEN e.event_date > CURDATE() OR (e.event_date = CURDATE() AND e.event_time > CURTIME()) THEN 1 END) as upcoming_bookings,
+                    COUNT(CASE WHEN e.event_date < CURDATE() OR (e.event_date = CURDATE() AND e.event_time <= CURTIME()) THEN 1 END) as past_bookings,
                     COUNT(CASE WHEN b.booking_status = 'cancelled' THEN 1 END) as cancelled_bookings,
                     COALESCE(AVG(b.total_price), 0) as average_booking_value,
                     COALESCE(MAX(b.total_price), 0) as most_expensive_booking,
