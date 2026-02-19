@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS events (
     venue VARCHAR(255),
     event_date DATE NOT NULL,
     event_time TIME NOT NULL,
+    event_end_time TIME,
     price DECIMAL(10,2) NOT NULL,
     available_seats INT DEFAULT 100,
     total_seats INT DEFAULT 100,
