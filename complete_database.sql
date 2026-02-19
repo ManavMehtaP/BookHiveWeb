@@ -262,7 +262,7 @@ GROUP BY u.id, u.username, u.email;
 
 INSERT INTO categories (name, description, color) VALUES
 ('Music', 'Live concerts and musical performances', '#ff5e1a'),
-('Technology', 'Tech conferences and workshops', '#3b82f6'),
+('Festivals', 'Cultural celebrations and festive events', '#f59e0b'),
 ('Food & Drink', 'Culinary events and festivals', '#10b981'),
 ('Sports', 'Sports events and competitions', '#ef4444'),
 ('Art', 'Art exhibitions and galleries', '#a855f7'),
@@ -276,7 +276,7 @@ INSERT INTO users (username, email, password_user, full_name, role) VALUES
 
 INSERT INTO events (title, genre, location, venue, event_date, event_time, price, available_seats, total_seats, image_url, image_filename, description, featured, status, created_by) VALUES
 ('Summer Music Festival', 'Music', 'Central Park, New York', 'Central Park Amphitheater', '2024-07-15', '18:00:00', 89.99, 75, 100, 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800', 'summer_music_festival.jpg', 'The biggest music festival of the summer featuring top artists from around the world.', TRUE, 'active', 1),
-('Tech Conference 2024', 'Technology', 'Moscone Center, San Francisco', 'Moscone Center Hall A', '2024-08-22', '09:00:00', 299.99, 150, 200, 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800', 'tech_conference_2024.jpg', 'Annual technology conference showcasing the latest innovations and trends.', TRUE, 'active', 1),
+('Cultural Fest 2024', 'Festivals', 'Central Park, New York', 'Festival Grounds', '2024-08-22', '10:00:00', 299.99, 150, 200, 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800', 'cultural_fest_2024.jpg', 'Annual cultural festival celebrating diversity and heritage.', TRUE, 'active', 1),
 ('Food & Wine Expo', 'Food & Drink', 'Navy Pier, Chicago', 'Navy Pier Grand Hall', '2024-09-05', '11:00:00', 65.50, 200, 250, 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800', 'food_wine_expo.jpg', 'Experience the finest cuisine and wines from top chefs and wineries.', FALSE, 'active', 1),
 ('Marathon 2024', 'Sports', 'Downtown, Boston', 'Boston Common Start Line', '2024-10-10', '07:00:00', 120.00, 500, 500, 'https://images.unsplash.com/photo-1530137073521-4391dd269d39?w=800', 'marathon_2024.jpg', 'Annual marathon through the historic streets of Boston.', FALSE, 'active', 1),
 ('Art Exhibition', 'Art', 'The Met, New York', 'Metropolitan Museum Gallery', '2024-11-15', '10:00:00', 35.00, 80, 100, 'https://images.unsplash.com/photo-1531913764164-f85c52d6e654?w=800', 'art_exhibition.jpg', 'Contemporary art exhibition featuring emerging artists.', FALSE, 'active', 1),
@@ -285,7 +285,7 @@ INSERT INTO events (title, genre, location, venue, event_date, event_time, price
 INSERT INTO bookings (event_id, user_id, booking_reference, customer_name, customer_email, phone, seats_booked, total_price, booking_status, payment_status, notes) VALUES
 (1, 2, 'BK20240208ABC123', 'John Doe', 'john@example.com', '555-0101', 2, 179.98, 'active', 'paid', 'Excited for the music festival!'),
 (1, NULL, 'BK20240208DEF456', 'Jane Smith', 'jane@email.com', '555-0102', 3, 269.97, 'active', 'paid', 'Guest booking - paid at venue'),
-(2, 2, 'BK20240208GHI789', 'John Doe', 'john@example.com', '555-0101', 1, 299.99, 'active', 'paid', 'Looking forward to learning about new tech'),
+(2, 2, 'BK20240208GHI789', 'John Doe', 'john@example.com', '555-0101', 1, 299.99, 'active', 'paid', 'Looking forward to the cultural festival!'),
 (3, NULL, 'BK20240208JKL012', 'Bob Johnson', 'bob@company.com', '555-0103', 5, 327.50, 'active', 'paid', 'Corporate team building event'),
 (4, 2, 'BK20240208MNO345', 'John Doe', 'john@example.com', '555-0101', 1, 120.00, 'active', 'paid', 'Work schedule confirmed'),
 (5, NULL, 'BK20240208PQR678', 'Alice Brown', 'alice@email.com', '555-0104', 2, 70.00, 'active', 'paid', 'Date night with friend');
