@@ -1,0 +1,57 @@
+<header>
+    <nav class="navbar navbar-expand-lg fixed-top" id="navbar">
+        <div class="container">
+            <a class="navbar-brand text-white d-flex align-items-center" href="{{ url_for('home') }}">
+                <div class="logo-square">B</div>
+                <span class="ms-2">Book Hive</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars text-white"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if request.endpoint == 'home' and '/admin' not in request.path %}
+                        <li class="nav-item"><a class="nav-link px-4" href="{{ url_for('about') }}">About</a></li>
+                        <li class="nav-item"><a class="nav-link px-4" href="#categories">Categories</a></li>
+                        <li class="nav-item"><a class="nav-link px-4" href="#events">Events</a></li>
+                    {% endif %}
+
+                    
+                    {% if session.get('user_id') %}
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle px-4 {% if '/admin' in request.path %}admin-dropdown{% endif %}" 
+                               href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-no-dropdown-toggle="true"
+                               {% if '/admin' in request.path %}style="margin-right: 0 !important; padding: 0.4rem 1rem !important; transform: none !important;"{% endif %}>
+                                <i class="fas fa-user me-1"></i>{{ session.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% if session.role == 'admin' %}
+                                    <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}">
+                                        <i class="fas fa-cog me-2"></i>Admin Dashboard
+                                    </a></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{{ url_for('user_profile') }}">
+                                    <i class="fas fa-user-circle me-2"></i>My Profile
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('my_bookings') }}">
+                                    <i class="fas fa-ticket me-2"></i>My Bookings
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        
+                        <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                            <a href="{{ url_for('login') }}" class="btn btn-action w-100">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>

@@ -1,0 +1,228 @@
+/* Enhanced Event Thumbnail Styles */
+    .event-thumbnail {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid var(--glass-border);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: var(--transition-smooth);
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+    }
+
+    .event-thumbnail:hover {
+        transform: scale(1.1);
+        border-color: var(--primary-orange);
+        box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4);
+    }
+
+    /* Enhanced Table Styles */
+    .table-dark {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .table-dark th {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(234, 88, 12, 0.3));
+        border-bottom: 2px solid var(--glass-border);
+        color: #ffffff;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 1rem 0.75rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .table-dark td {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+        color: #e5e7eb;
+    }
+
+    .table-dark tbody tr:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .table-dark tbody tr:hover td {
+        color: #ffffff;
+    }
+
+    .table-responsive {
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-large);
+    }
+
+    /* Enhanced Badge Styles */
+    .badge-custom {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: var(--transition-smooth);
+        color: #ffffff !important;
+    }
+
+    .badge-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Genre-specific badge colors */
+    .badge-music { background: linear-gradient(135deg, #ff5e1a, #ff8c42); }
+    .badge-festivals { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+    .badge-food { background: linear-gradient(135deg, #10b981, #34d399); }
+    .badge-sports { background: linear-gradient(135deg, #ef4444, #f87171); }
+    .badge-art { background: linear-gradient(135deg, #a855f7, #c084fc); }
+    .badge-comedy { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+
+    /* Enhanced Progress Bar */
+    .progress {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+        transition: width 0.6s ease;
+        background: linear-gradient(90deg, var(--primary-gradient));
+    }
+
+    /* Enhanced Button Styles */
+    .btn-outline-admin {
+        background: rgba(255, 94, 26, 0.15);
+        border: 1px solid rgba(255, 94, 26, 0.6);
+        color: var(--primary-orange);
+        backdrop-filter: blur(10px);
+        transition: var(--transition-smooth);
+        font-weight: 500;
+    }
+
+    .btn-outline-admin:hover {
+        background: rgba(255, 94, 26, 0.25);
+        border-color: var(--primary-orange);
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 94, 26, 0.4);
+    }
+
+    .btn-outline-danger {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.6);
+        color: #fca5a5;
+        backdrop-filter: blur(10px);
+        transition: var(--transition-smooth);
+        font-weight: 500;
+    }
+
+    .btn-outline-danger:hover {
+        background: rgba(239, 68, 68, 0.25);
+        border-color: #fca5a5;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-outline-light {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+        backdrop-filter: blur(10px);
+        transition: var(--transition-smooth);
+        font-weight: 500;
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #ffffff;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #ea580c) !important;
+        border: none !important;
+        font-weight: 600 !important;
+        padding: 12px 24px !important;
+        transition: var(--transition-smooth);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Enhanced Text Colors */
+    .text-white {
+        color: #ffffff !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .text-success {
+        color: #34d399 !important;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .text-orange {
+        color: #fb923c !important;
+        font-weight: 500;
+    }
+
+    /* Icon enhancements */
+    .fas {
+        color: #e5e7eb;
+    }
+
+    .text-orange .fas {
+        color: #fb923c !important;
+    }
+
+    .text-success .fas {
+        color: #34d399 !important;
+    }
+
+    /* Container Enhancement */
+    .container {
+        max-width: 1400px;
+    }
+
+    /* Page header enhancement */
+    h2 {
+        color: #ffffff !important;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Empty state enhancement - using global CSS now */
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .event-thumbnail {
+            width: 50px;
+            height: 50px;
+        }
+
+        .table-dark th,
+        .table-dark td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .table-dark td {
+            color: var(--text-primary);
+        }
+    }

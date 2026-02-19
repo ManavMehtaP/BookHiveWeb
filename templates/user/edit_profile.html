@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Book Hive{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-profile-header {
+        background: linear-gradient(135deg, var(--primary-gradient));
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: var(--border-radius-lg);
+    }
+    
+    .form-section {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(20px);
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+        border-radius: var(--border-radius);
+        padding: 0.75rem;
+        transition: var(--transition-base);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--primary-orange);
+        box-shadow: 0 0 0 0.2rem rgba(255, 94, 26, 0.25);
+        color: var(--text-primary);
+    }
+    
+    .form-control::placeholder {
+        color: #ffffff;
+    }
+    
+    .btn-primary-custom {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: var(--transition-base);
+    }
+    
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 94, 26, 0.3);
+    }
+    
+    .btn-secondary-custom {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        border: 1px solid var(--glass-border);
+        padding: 0.75rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: var(--transition-base);
+    }
+    
+    .btn-secondary-custom:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .character-count {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        text-align: right;
+        margin-top: 0.25rem;
+    }
+    
+    .help-text {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    <div class="mb-3">
+        <a href="{{ url_for('user_profile') }}" class="btn back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Back to My Profile
+        </a>
+    </div>
+    
+    
+    <div class="edit-profile-header">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold mb-2">Edit Profile</h1>
+            <p class="lead">Update your personal information and preferences</p>
+        </div>
+    </div>
+
+    <form method="POST">
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-user me-2"></i>Basic Information
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="full_name" class="form-label">Full Name *</label>
+                    <input type="text" class="form-control" id="full_name" name="full_name" 
+                           value="{{ user.full_name }}" required minlength="2" maxlength="50">
+                    <div class="help-text">Your full name as it should appear on bookings</div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email Address *</label>
+                    <input type="email" class="form-control" id="email" name="email" 
+                           value="{{ user.email }}" required maxlength="100">
+                    <div class="help-text">Used for booking confirmations and notifications</div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" 
+                           value="{{ user.phone }}" placeholder="+1 (555) 123-4567"
+                           pattern="[6-9]\d{9}" maxlength="10">
+                    <div class="help-text">Optional - for urgent booking updates</div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="date_of_birth" class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+                           value="{{ profile.date_of_birth }}">
+                    <div class="help-text">Optional - helps us recommend age-appropriate events</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-map-marker-alt me-2"></i>Address Information
+            </h3>
+            
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <label for="address" class="form-label">Street Address</label>
+                    <input type="text" class="form-control" id="address" name="address" 
+                           value="{{ profile.address }}" placeholder="123 Main Street">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="city" 
+                           value="{{ profile.city }}" placeholder="New York">
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="state" class="form-label">State/Province</label>
+                    <input type="text" class="form-control" id="state" name="state" 
+                           value="{{ profile.state }}" placeholder="NY">
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="zip_code" class="form-label">ZIP/Postal Code</label>
+                    <input type="text" class="form-control" id="zip_code" name="zip_code" 
+                           value="{{ profile.zip_code }}" placeholder="10001">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="country" class="form-label">Country</label>
+                    <select class="form-select" id="country" name="country">
+                        <option value="">Select Country</option>
+                        <option value="US" {% if profile.country == 'US' %}selected{% endif %}>United States</option>
+                        <option value="CA" {% if profile.country == 'CA' %}selected{% endif %}>Canada</option>
+                        <option value="UK" {% if profile.country == 'UK' %}selected{% endif %}>United Kingdom</option>
+                        <option value="AU" {% if profile.country == 'AU' %}selected{% endif %}>Australia</option>
+                        <option value="IN" {% if profile.country == 'IN' %}selected{% endif %}>India</option>
+                        <option value="DE" {% if profile.country == 'DE' %}selected{% endif %}>Germany</option>
+                        <option value="FR" {% if profile.country == 'FR' %}selected{% endif %}>France</option>
+                        <option value="JP" {% if profile.country == 'JP' %}selected{% endif %}>Japan</option>
+                        <option value="Other" {% if profile.country == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-pen me-2"></i>Personal Bio
+            </h3>
+            
+            <div class="mb-3">
+                <label for="bio" class="form-label">Tell us about yourself</label>
+                <textarea class="form-control" id="bio" name="bio" rows="4" 
+                          placeholder="Share your interests, favorite event types, or anything you'd like others to know..."
+                          maxlength="500">{{ profile.bio }}</textarea>
+                <div class="character-count">
+                    <span id="bioCharCount">{{ profile.bio|length or 0 }}</span>/500 characters
+                </div>
+                <div class="help-text">This information helps us personalize your event recommendations</div>
+            </div>
+        </div>
+
+        
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary-custom btn-lg me-3">
+                <i class="fas fa-save me-2"></i>Save Changes
+            </button>
+            <a href="{{ url_for('user_profile') }}" class="btn btn-secondary-custom btn-lg">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Character counter for bio
+document.getElementById('bio').addEventListener('input', function() {
+    const charCount = this.value.length;
+    document.getElementById('bioCharCount').textContent = charCount;
+    
+    if (charCount > 450) {
+        document.getElementById('bioCharCount').style.color = '#ef4444';
+    } else {
+        document.getElementById('bioCharCount').style.color = '#ffffff';
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const fullName = document.getElementById('full_name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    
+    if (!fullName || fullName.length < 2) {
+        e.preventDefault();
+        alert('Please enter a valid full name (at least 2 characters)');
+        return;
+    }
+    
+    if (!email || !email.includes('@')) {
+        e.preventDefault();
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    const phone = document.getElementById('phone').value.trim();
+    if (phone && !/^[\d\s\-\+\(\)]+$/.test(phone)) {
+        e.preventDefault();
+        alert('Please enter a valid phone number');
+        return;
+    }
+});
+
+// Phone number formatting
+document.getElementById('phone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 0) {
+        if (value.length <= 3) {
+            value = value;
+        } else if (value.length <= 6) {
+            value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+        } else if (value.length <= 10) {
+            value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+        } else {
+            value = `+${value.slice(0, 1)} (${value.slice(1, 4)}) ${value.slice(4, 7)}-${value.slice(7, 11)}`;
+        }
+    }
+    e.target.value = value;
+});
+</script>
+{% endblock %}

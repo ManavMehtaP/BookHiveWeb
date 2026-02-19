@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}About Book Hive - Your Premier Event Booking Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="about-hero">
+    <div class="hero-content">
+        <div class="hero-badge">About Book Hive</div>
+        <h1 class="hero-title">Your Gateway to Unforgettable Events</h1>
+        <p class="hero-subtitle">Connecting People Through Amazing Experiences</p>
+        <p class="hero-description">
+            Book Hive is a premier event booking platform that connects event organizers with enthusiastic attendees. 
+            We make discovering, booking, and managing events seamless and enjoyable for everyone involved.
+        </p>
+    </div>
+</section>
+
+
+<section class="about-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Our Purpose</h2>
+            <p class="section-subtitle">Driving innovation in event management and creating memorable experiences</p>
+        </div>
+        <div class="mission-grid">
+            <div class="mission-card">
+                <div class="mission-icon">🎯</div>
+                <h3 class="mission-title">Our Mission</h3>
+                <p class="mission-text">
+                    To revolutionize the event booking experience by providing a user-friendly platform that 
+                    brings people together through memorable events. We strive to make event discovery effortless 
+                    and booking secure for both organizers and attendees.
+                </p>
+            </div>
+            <div class="mission-card">
+                <div class="mission-icon">👁️</div>
+                <h3 class="mission-title">Our Vision</h3>
+                <p class="mission-text">
+                    To become the world's most trusted event booking platform, where every event finds its 
+                    perfect audience and every attendee discovers experiences that enrich their lives.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="about-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Why Choose Book Hive?</h2>
+            <p class="section-subtitle">Discover features that make us the preferred choice for event management</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Secure Booking</h3>
+                <p class="feature-text">
+                    Advanced security measures to protect your personal and payment information
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3 class="feature-title">Easy Discovery</h3>
+                <p class="feature-text">
+                    Intuitive search and filtering to find events that match your interests perfectly
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3 class="feature-title">Community Focused</h3>
+                <p class="feature-text">
+                    Building connections through shared experiences and memorable events
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎧</div>
+                <h3 class="feature-title">24/7 Support</h3>
+                <p class="feature-text">
+                    Round-the-clock customer support to assist with all your booking needs
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="about-section">
+    <div class="container">
+        <div class="stats-section">
+            <div class="section-header">
+                <h2 class="section-title">Our Impact</h2>
+                <p class="section-subtitle">Numbers that speak volumes about our success</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">10,000+</div>
+                    <p class="stat-label">Events Hosted</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50,000+</div>
+                    <p class="stat-label">Happy Customers</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <p class="stat-label">Partner Venues</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4.9/5</div>
+                    <p class="stat-label">Customer Rating</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="about-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Meet Our Team</h2>
+            <p class="section-subtitle">The passionate individuals behind Book Hive's success</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card">
+                <img src="/static/images/sahil.jpeg" alt="Sahil Katariya" class="team-avatar">
+                <h3 class="team-name">Sahil Katariya</h3>
+                <p class="team-role">CEO & Founder</p>
+                <p class="team-bio">
+                    Passionate about creating exceptional event experiences and building strong communities.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link">in</a>
+                    <a href="#" class="social-link">tw</a>
+                    <a href="#" class="social-link">@</a>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="/static/images/manav.jpg" alt="Manav Mehta" class="team-avatar">
+                <h3 class="team-name">Manav Mehta</h3>
+                <p class="team-role">CTO</p>
+                <p class="team-bio">
+                    Festivals enthusiast focused on creating memorable event experiences and community celebrations.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link">in</a>
+                    <a href="#" class="social-link">gh</a>
+                    <a href="#" class="social-link">@</a>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="/static/images/hetvi.jpeg" alt="Hetvi Patel" class="team-avatar">
+                <h3 class="team-name">Hetvi Patel</h3>
+                <p class="team-role">Head of Operations</p>
+                <p class="team-bio">
+                    Dedicated to ensuring seamless experiences for both event organizers and attendees.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link">in</a>
+                    <a href="#" class="social-link">tw</a>
+                    <a href="#" class="social-link">@</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="about-section">
+    <div class="container">
+        <div class="contact-section">
+            <div class="section-header">
+                <h2 class="section-title">Get In Touch</h2>
+                <p class="section-subtitle">Have questions or suggestions? We'd love to hear from you!</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <div class="contact-icon">📧</div>
+                    <p class="contact-text">support@bookhive.com</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📞</div>
+                    <p class="contact-text">+91-99999 99999</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📍</div>
+                    <p class="contact-text">Ahmedabad, Gujarat</p>
+                </div>
+            </div>
+            <div class="button-group">
+                <a href="{{ url_for('home') }}" class="btn btn-primary">
+                    🏠 Back to Home
+                </a>
+                {% if not session.get('user_id') %}
+                <a href="{{ url_for('login') }}" class="btn btn-secondary">
+                    🔑 Sign Up Now
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

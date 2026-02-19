@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Book Hive{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="alert-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<div class="container mt-5">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-lg-6 col-md-8">
+            <div class="admin-card">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-ticket-alt fa-4x text-orange"></i>
+                        </div>
+                        <h2 class="fw-bold">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Book Hive
+                        </h2>
+                        <p class="text-muted">Access your event management dashboard</p>
+                    </div>
+                    
+                    <form method="POST" autocomplete="off">
+                        <div class="mb-4">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user me-2"></i>Username
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary">
+                                    <i class="fas fa-user text-orange"></i>
+                                </span>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" 
+                                       id="username" name="username" required autocomplete="new-username"
+                                       placeholder="Enter your username">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary">
+                                    <i class="fas fa-lock text-orange"></i>
+                                </span>
+                                <input type="password" class="form-control bg-dark text-white border-secondary" 
+                                       id="password" name="password" required autocomplete="new-password"
+                                       placeholder="Enter your password">
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-admin btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login to Dashboard
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-3">
+                            Don't have an account? 
+                            <a href="#" class="text-primary text-decoration-none fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">
+                                Sign up
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content signup-modal-content border-0 overflow-hidden">
+            
+            <div class="modal-header signup-modal-header border-0 position-relative">
+                <div class="signup-header-bg position-absolute top-0 start-0 w-100 h-100"></div>
+                <div class="position-relative z-2 text-center w-100">
+                    <div class="signup-icon-wrapper mb-3">
+                        <i class="fas fa-user-plus signup-icon"></i>
+                    </div>
+                    <h5 class="modal-title signup-title" id="signupModalLabel">
+                        Join Book Hive
+                    </h5>
+                    <p class="signup-subtitle mb-0">Create your account and start booking amazing events</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            
+            <div class="modal-body signup-modal-body p-4">
+                <form id="signupForm" autocomplete="off" class="signup-form">
+                    <div class="row">
+                        
+                        <div class="col-md-6">
+                            <div class="signup-field-group">
+                                <label for="signup_username" class="signup-field-label">
+                                    <i class="fas fa-user me-2"></i>Username
+                                </label>
+                                <div class="signup-input-wrapper">
+                                    <input type="text" class="signup-input" 
+                                           id="signup_username" name="username" required autocomplete="new-username"
+                                           placeholder="Choose a username" minlength="3" maxlength="20">
+                                    <div class="signup-input-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                                <small class="signup-help-text">3-20 characters, letters and numbers only</small>
+                            </div>
+                            
+                            <div class="signup-field-group">
+                                <label for="signup_email" class="signup-field-label">
+                                    <i class="fas fa-envelope me-2"></i>Email Address
+                                </label>
+                                <div class="signup-input-wrapper">
+                                    <input type="email" class="signup-input" 
+                                           id="signup_email" name="email" required autocomplete="new-email"
+                                           placeholder="your@email.com">
+                                    <div class="signup-input-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                </div>
+                                <small class="signup-help-text"><br></small>
+                            </div>
+                            
+                            <div class="signup-field-group">
+                                <label for="signup_fullname" class="signup-field-label">
+                                    <i class="fas fa-id-card me-2"></i>Full Name
+                                </label>
+                                <div class="signup-input-wrapper">
+                                    <input type="text" class="signup-input" 
+                                           id="signup_fullname" name="fullname" required autocomplete="name"
+                                           placeholder="John Doe" minlength="2" maxlength="50">
+                                    <div class="signup-input-icon">
+                                        <i class="fas fa-id-card"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="col-md-6">
+                            <div class="signup-field-group">
+                                <label for="signup_phone" class="signup-field-label">
+                                    <i class="fas fa-phone me-2"></i>Phone Number
+                                </label>
+                                <div class="signup-input-wrapper position-relative">
+                                    <input type="tel" class="signup-input" 
+                                           id="signup_phone" name="phone" required autocomplete="tel"
+                                           placeholder="9876543210" pattern="[6-9]\d{9}" maxlength="10">
+                                    <div class="signup-input-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                </div>
+                                <small class="signup-help-text">10 digit mobile number starting with 6-9</small>
+                            </div>
+                            
+                            <div class="signup-field-group">
+                                <label for="signup_password" class="signup-field-label">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
+                                <div class="signup-input-wrapper">
+                                    <input type="password" class="signup-input" 
+                                           id="signup_password" name="password" required autocomplete="new-password"
+                                           placeholder="Create a strong password" minlength="6">
+                                    <div class="signup-input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+                                <small class="signup-help-text">Minimum 6 characters</small>
+                            </div>
+                            
+                            <div class="signup-field-group">
+                                <label for="signup_confirm_password" class="signup-field-label">
+                                    <i class="fas fa-lock me-2"></i>Confirm Password
+                                </label>
+                                <div class="signup-input-wrapper">
+                                    <input type="password" class="signup-input" 
+                                           id="signup_confirm_password" name="confirm_password" required autocomplete="new-password"
+                                           placeholder="Re-enter your password">
+                                    <div class="signup-input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="signup-field-group mt-3">
+                        <div class="signup-terms-wrapper">
+                            <input class="signup-checkbox" type="checkbox" id="signup_terms" name="terms" required>
+                            <label class="signup-terms-label" for="signup_terms">
+                                I agree to the <a href="#" class="signup-link">Terms and Conditions</a> and <a href="#" class="signup-link">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="signup-actions mt-4">
+                        <button type="submit" class="signup-btn signup-btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                            <div class="signup-btn-glow"></div>
+                        </button>
+                        <button type="button" class="signup-btn signup-btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+// Sign up form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const signupForm = document.getElementById('signupForm');
+    const passwordInput = document.getElementById('signup_password');
+    const confirmPasswordInput = document.getElementById('signup_confirm_password');
+    const usernameInput = document.getElementById('signup_username');
+    const phoneInput = document.getElementById('signup_phone');
+    
+    if (signupForm) {
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let isValid = true;
+            
+            // Validate password match
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                alert('Passwords do not match!');
+                isValid = false;
+            }
+            
+            // Validate username format
+            const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+            if (!usernameRegex.test(usernameInput.value)) {
+                alert('Username must be 3-20 characters and contain only letters, numbers, and underscores!');
+                isValid = false;
+            }
+            
+            // Validate phone number (10 digits starting with 6-9)
+            const phoneValue = phoneInput.value;
+            const phoneRegex = /^[6-9]\d{9}$/;
+            
+            if (!phoneValue || phoneValue === '') {
+                alert('Please enter a phone number.');
+                isValid = false;
+            } else if (!phoneRegex.test(phoneValue)) {
+                alert('Please enter a valid 10-digit mobile number starting with 6-9.');
+                isValid = false;
+            }
+            
+            // Check terms
+            const termsChecked = document.getElementById('signup_terms').checked;
+            if (!termsChecked) {
+                alert('You must agree to the terms and conditions!');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                return;
+            }
+            
+            // Create form data for submission
+            const formData = new FormData(signupForm);
+            
+            // Submit via AJAX
+            fetch('/signup', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // Close the modal and reset form
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('signupModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    signupForm.reset();
+                    // Stay on the same page - no redirect needed
+                } else {
+                    alert(data.message);
+                    // User stays on the modal - no redirect
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+        
+        // Real-time password match validation
+        confirmPasswordInput.addEventListener('input', function() {
+            if (this.value !== passwordInput.value) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+        
+        // Real-time username validation
+        usernameInput.addEventListener('input', function() {
+            const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+            if (!usernameRegex.test(this.value)) {
+                this.setCustomValidity('Username must be 3-20 characters and contain only letters, numbers, and underscores');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+        
+        // Real-time phone validation
+        phoneInput.addEventListener('input', function() {
+            const phoneValue = this.value;
+            const phoneRegex = /^[6-9]\d{9}$/;
+            
+            if (!phoneValue || phoneValue === '') {
+                this.setCustomValidity('Please enter a phone number.');
+            } else if (!phoneRegex.test(phoneValue)) {
+                this.setCustomValidity('Please enter a valid 10-digit mobile number starting with 6-9.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+        
+        // Add phone input animation on focus
+        phoneInput.addEventListener('focus', function() {
+            this.style.borderColor = 'var(--primary-orange)';
+            this.style.transform = 'scale(1.02)';
+            this.style.transition = 'all 0.3s ease';
+        });
+        
+        phoneInput.addEventListener('blur', function() {
+            this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            this.style.transform = 'scale(1)';
+        });
+        
+    } else {
+        // Signup form not found - nothing to do
+    }
+    
+});
+</script>
+
+{% endblock %}

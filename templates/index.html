@@ -1,0 +1,732 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Hive - Experience Live Events{% endblock %}
+
+{% block content %}
+
+<div class="fire-embers-container" id="fireEmbersContainer">
+    
+</div>
+
+<div class="alert-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+
+<section class="hero-section pt-5" id="home">
+    <div class="container">
+        <div class="badge-premium reveal">
+            <i class="fas fa-sparkles"></i> Experience the extraordinary
+        </div>
+        <h1 class="hero-title reveal stagger-1">Book Hive <span>Experience.</span></h1>
+        <p class="hero-lead reveal stagger-2">
+            Elevate your live entertainment journey. Discover premium access to the world's most sought-after events with seamless booking.
+        </p>
+
+        <div class="search-wrapper reveal stagger-3">
+            <i class="fas fa-search ms-4 text-secondary fs-4"></i>
+            <input type="text" class="search-input" placeholder="Search events, artists, or venues..." id="searchInput" autocomplete="off">
+            <button class="btn btn-action me-2">Find Seats</button>
+        </div>
+    </div>
+</section>
+
+
+<section class="py-2 my-1" id="categories">
+    <div class="container">
+        <div class="section-header text-center mb-2">
+            <span class="tag-line">Browse by Category</span>
+            <h2 class="display-6 fw-bold">Find Events You Love</h2>
+            <button id="showAllBtn" class="btn btn-sm btn-outline-light mt-2" style="display: none;" onclick="showAllEvents()">
+                <i class="fas fa-times me-2"></i>Show All Events
+            </button>
+        </div>
+        
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+        
+        <div class="row g-4">
+            {% set genre_icons = {
+                'Music': 'fa-music',
+                'Sports': 'fa-futbol',
+                'Food & Drink': 'fa-utensils',
+                'Art': 'fa-palette',
+                'Festivals': 'fa-calendar-star',
+                'Comedy': 'fa-laugh',
+                'Business': 'fa-briefcase'
+            } %}
+            
+            {% for category in categories %}
+            <div class="col-lg-4 col-md-6">
+                <div class="category-card p-4 rounded-4 bg-glass d-flex align-items-center" 
+                     onclick="filterByCategory('{{ category.genre }}')" 
+                     style="cursor: pointer;">
+                    <div class="category-icon">
+                        <i class="fas {{ genre_icons.get(category.genre, 'fa-calendar') }} fa-2x text-orange"></i>
+                    </div>
+                    <div class="category-details ms-3">
+                        <h4 class="mb-1">{{ category.genre }}</h4>
+                        <p class="mb-0">{{ category.count }} events</p>
+                    </div>
+                    <div class="ms-auto">
+                        <i class="fas fa-chevron-right text-muted"></i>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<section class="py-4 my-3" id="events">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="tag-line">Curated Selection</span>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-4">
+                <h2 class="display-4 fw-extrabold mb-0">All Events</h2>
+                <div class="d-flex gap-2">
+                    {% if is_admin %}
+                        <a href="{{ url_for('add_event') }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold">
+                            <i class="fas fa-plus me-2"></i>Add Event
+                        </a>
+                    {% endif %}
+                    <a href="#" class="btn btn-outline-light rounded-pill px-4 py-2 fw-bold border-secondary hover-orange" onclick="showAllEvents(); return false;">
+                        Browse All <i class="fas fa-arrow-right-long ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4" id="eventsGrid">
+            {% for event in events %}
+            <div class="col-lg-4 col-md-6 reveal stagger-{{ (loop.index % 3) + 1 }} event-item" data-genre="{{ event.genre }}">
+                <div class="event-card" onclick="{% if session.get('user_id') %}showEventDetails({{ event.id }}){% else %}if(confirm('Please login to continue. Redirect to login page?')){window.location.href='{{ url_for('login') }}'}{% endif %}">
+                    <div class="card-image-box">
+                        <img src="{{ event.image_url }}" alt="{{ event.title }}" loading="lazy">
+                    </div>
+                    <div class="card-content text-white">
+                        <div class="card-info-line">
+                            <i class="fas fa-map-marker-alt text-orange"></i>
+                            <span>{{ event.location }}</span>
+                        </div>
+                        <div class="card-info-line">
+                            <i class="fas fa-clock text-orange"></i>
+                            <span>{{ event.date }} at {{ event.time }}{% if event.end_time %} - {{ event.end_time }}{% endif %}</span>
+                        </div>
+                        <p class="card-description">{{ event.description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content admin-card">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white" id="eventDetailsModalLabel">Event Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="eventDetailsContent">
+                
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-admin" id="bookEventBtn">Book Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% if not session.get('user_id') %}
+<section class="py-4 my-3">
+    <div class="container">
+        <div class="cta-card-minimal p-4 rounded-4 text-center position-relative overflow-hidden">
+            <div class="cta-content-minimal position-relative z-2">
+                <h2 class="cta-title mb-3">Discover Amazing Events</h2>
+                <p class="cta-subtitle mb-4">Join thousands finding the best experiences in your city.</p>
+                <div class="cta-buttons-minimal d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{{ url_for('login') }}" class="btn-cta-primary">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+            <div class="cta-bg-animation-minimal position-absolute top-0 start-0 w-100 h-100">
+                <div class="floating-shape-minimal shape-1-minimal"></div>
+                <div class="floating-shape-minimal shape-2-minimal"></div>
+                <div class="floating-shape-minimal shape-3-minimal"></div>
+                <div class="light-pulse light-pulse-1"></div>
+                <div class="light-pulse light-pulse-2"></div>
+                <div class="sparkle sparkle-1"></div>
+                <div class="sparkle sparkle-2"></div>
+                <div class="sparkle sparkle-3"></div>
+                <div class="sparkle sparkle-4"></div>
+                <div class="light-beam"></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    // Initialize when document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize scroll reveal
+        initScrollReveal();
+        
+        // Handle search functionality
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.event-card');
+                
+                cards.forEach(card => {
+                    const description = card.querySelector('.card-description').textContent.toLowerCase();
+                    const location = card.querySelector('.card-info-line').textContent.toLowerCase();
+                    
+                    if (location.includes(term) || description.includes(term)) {
+                        card.closest('.col-lg-4').style.display = 'block';
+                    } else {
+                        card.closest('.col-lg-4').style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+    
+    // Initialize scroll reveal
+    function initScrollReveal() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }
+    
+    // Navbar effect on scroll
+    window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+    
+    // Hide loader when page is loaded
+    window.addEventListener('load', function() {
+        const loader = document.getElementById('loader');
+        if (loader) {
+            setTimeout(() => {
+                loader.classList.add('fade-out');
+                // Remove loader from DOM after animation
+                setTimeout(() => {
+                    loader.remove();
+                }, 500);
+            }, 500);
+        }
+    });
+
+    // Initialize fire embers
+    function initFireEmbers() {
+        const container = document.getElementById('fireEmbersContainer');
+        if (!container) return;
+        
+        // Create embers periodically
+        function createEmber() {
+            const ember = document.createElement('div');
+            ember.className = 'fire-ember';
+            
+            // Random size variation
+            const sizeRandom = Math.random();
+            if (sizeRandom < 0.3) {
+                ember.classList.add('small');
+            } else if (sizeRandom > 0.7) {
+                ember.classList.add('large');
+            }
+            
+            // Random horizontal position
+            const xPos = Math.random() * 100;
+            ember.style.left = xPos + '%';
+            
+            // Random animation duration (8-15 seconds)
+            const duration = 8 + Math.random() * 7;
+            ember.style.animationDuration = duration + 's';
+            
+            // Random animation delay
+            const delay = Math.random() * 2;
+            ember.style.animationDelay = delay + 's';
+            
+            container.appendChild(ember);
+            
+            // Remove ember after animation completes
+            setTimeout(() => {
+                if (ember.parentNode) {
+                    ember.parentNode.removeChild(ember);
+                }
+            }, (duration + delay) * 1000);
+        }
+        
+        // Create initial embers
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => createEmber(), i * 200);
+        }
+        
+        // Continue creating embers
+        setInterval(createEmber, 800);
+    }
+    
+    // Initialize fire embers when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initFireEmbers();
+    });
+
+    // Show event details in modal
+    function showEventDetails(eventId) {
+        // Show the modal footer when going back to event details
+        const modalFooter = document.querySelector('#eventDetailsModal .modal-footer');
+        if (modalFooter) {
+            modalFooter.style.display = '';
+        }
+        
+        // Show loading state
+        const modalContent = `
+            <div class="text-center py-5">
+                <i class="fas fa-spinner fa-spin fa-3x text-orange mb-3"></i>
+                <p class="text-white">Loading event details...</p>
+            </div>
+        `;
+        document.getElementById('eventDetailsContent').innerHTML = modalContent;
+        
+        // Fetch event details from API
+        fetch(`/api/event-details/${eventId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const event = data.event;
+                    
+                    // Populate modal content with real-time data
+                    const modalContent = `
+                        <img src="${event.image_url}" alt="${event.title}" class="event-detail-image">
+                        <h3 class="event-detail-title">${event.title}</h3>
+                        
+                        <div class="event-detail-meta">
+                            <div class="event-detail-meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span>${event.genre}</span>
+                            </div>
+                            <div class="event-detail-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${event.location}${event.venue ? `, ${event.venue}` : ''}</span>
+                            </div>
+                            <div class="event-detail-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${event.date}</span>
+                            </div>
+                            <div class="event-detail-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${event.time}${event.end_time ? ' - ' + event.end_time : ''}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="event-detail-description">
+                            <h5>About This Event</h5>
+                            <p>${event.description}</p>
+                        </div>
+                        
+                        <div class="event-detail-meta">
+                            <div class="event-detail-meta-item">
+                                <i class="fas fa-users"></i>
+                                <span>${event.available_seats} / ${event.total_seats} seats available</span>
+                            </div>
+                            <div class="event-detail-meta-item">
+                                <i class="fas fa-ticket-alt"></i>
+                                <span>Starting from</span>
+                            </div>
+                        </div>
+                        
+                        <div class="event-detail-price">$${parseFloat(event.price).toFixed(2)}</div>
+                    `;
+                    
+                    document.getElementById('eventDetailsContent').innerHTML = modalContent;
+                    
+                    // Set up book button with real-time event data
+                    const bookBtn = document.getElementById('bookEventBtn');
+                    bookBtn.onclick = function() {
+                        showBookingContactForm(event);
+                    };
+                } else {
+                    // Show error message
+                    const errorContent = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                            <h4 class="text-white mb-3">Event Not Found</h4>
+                            <p class="text-secondary mb-4">${data.message}</p>
+                            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    `;
+                    document.getElementById('eventDetailsContent').innerHTML = errorContent;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching event details:', error);
+                console.error('Error details:', error.message);
+                
+                // Show error message
+                const errorContent = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <h4 class="text-white mb-3">Connection Error</h4>
+                        <p class="text-secondary mb-4">Unable to load event details. Please check your connection and try again.</p>
+                        <p class="text-muted small mb-4">Error: ${error.message}</p>
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+                    </div>
+                `;
+                document.getElementById('eventDetailsContent').innerHTML = errorContent;
+            });
+        
+        // Show the modal (will show loading state first)
+        try {
+            const modal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+            modal.show();
+        } catch (error) {
+            // Fallback: try to show modal manually
+            const modalElement = document.getElementById('eventDetailsModal');
+            if (modalElement) {
+                modalElement.style.display = 'block';
+                modalElement.classList.add('show');
+                document.body.classList.add('modal-open');
+            }
+        }
+    }
+    
+    // Show booking contact form
+    function showBookingContactForm(event) {
+        // Hide the modal footer to prevent duplicate buttons
+        const modalFooter = document.querySelector('#eventDetailsModal .modal-footer');
+        if (modalFooter) {
+            modalFooter.style.display = 'none';
+        }
+        
+        const bookingContent = `
+            <div class="text-center mb-4">
+                <i class="fas fa-ticket-alt fa-3x text-orange mb-3"></i>
+                <h4 class="text-white">Book Tickets for ${event.title}</h4>
+                <p class="text-secondary">Select the number of tickets you want to book</p>
+            </div>
+            
+            <form id="bookingForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-white">
+                            <i class="fas fa-user me-2"></i>Name
+                        </label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" 
+                               value="{{ session.username if session.get('username') else '' }}" readonly>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-white">
+                            <i class="fas fa-envelope me-2"></i>Email
+                        </label>
+                        <input type="email" class="form-control bg-dark text-white border-secondary" 
+                               id="email" name="email" 
+                               value="{{ session.get('user_email', '') }}" 
+                               placeholder="Enter your email" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-white">
+                            <i class="fas fa-phone me-2"></i>Phone Number
+                        </label>
+                        <input type="tel" class="form-control bg-dark text-white border-secondary" 
+                               id="phone" name="phone" 
+                               value="{{ session.get('user_phone', '') }}" 
+                               placeholder="Enter your phone number" required
+                               pattern="[6-9]\d{9}" maxlength="10">
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-white">
+                            <i class="fas fa-users me-2"></i>Number of Tickets
+                        </label>
+                        <input type="number" class="form-control bg-dark text-white border-secondary" 
+                               id="tickets" name="tickets" min="1" max="10" required placeholder="Enter number of tickets">
+                    </div>
+                </div>
+                
+                <div class="alert alert-info bg-glass border-secondary">
+                    <h6 class="fw-bold mb-2">
+                        <i class="fas fa-info-circle me-2"></i>Event Details
+                    </h6>
+                    <div class="row text-start">
+                        <div class="col-md-6">
+                            <small class="d-block"><strong>Event:</strong> ${event.title}</small>
+                            <small class="d-block"><strong>Date:</strong> ${event.date}</small>
+                            <small class="d-block"><strong>Time:</strong> ${event.time}${event.end_time ? ' - ' + event.end_time : ''}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="d-block"><strong>Location:</strong> ${event.location}</small>
+                            <small class="d-block"><strong>Price:</strong> $${parseFloat(event.price).toFixed(2)} per ticket</small>
+                            <small class="d-block"><strong>Available:</strong> ${event.available_seats} seats</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-admin flex-fill">
+                        <i class="fas fa-paper-plane me-2"></i>Book Tickets
+                    </button>
+                    <button type="button" class="btn btn-outline-light" onclick="showEventDetails(${event.id})">
+                        <i class="fas fa-arrow-left me-2"></i>Back
+                    </button>
+                </div>
+            </form>
+        `;
+        
+        document.getElementById('eventDetailsContent').innerHTML = bookingContent;
+        
+        // Handle form submission
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const phone = document.getElementById('phone').value;
+            const phoneRegex = /^[6-9]\d{9}$/;
+            const tickets = document.getElementById('tickets').value;
+            
+            // Validate phone number
+            if (!phoneRegex.test(phone)) {
+                alert('Please enter a valid 10-digit mobile number starting with 6-9.');
+                return;
+            }
+            
+            // Validate ticket quantity
+            if (tickets < 1 || tickets > 10) {
+                alert('Please enter between 1 and 10 tickets.');
+                return;
+            }
+            
+            const formData = {
+                event_id: event.id,
+                name: "{{ session.username if session.get('username') else '' }}",
+                email: document.getElementById('email').value,
+                phone: phone,
+                tickets: tickets,
+                requests: ""  // No requests field
+            };
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            submitBtn.disabled = true;
+            
+            // Send booking request to backend
+            fetch('/api/book-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const successContent = `
+                        <div class="text-center">
+                            <i class="fas fa-check-circle fa-4x text-success mb-4"></i>
+                            <h4 class="text-white mb-3">${data.message}</h4>
+                            <p class="text-secondary mb-4">
+                                Thank you ${formData.name}! Your booking has been confirmed and tickets have been reserved.
+                            </p>
+                            <p class="text-secondary mb-4">
+                                A confirmation email has been sent to ${formData.email}. You can also reach us at ${formData.phone} if needed.
+                            </p>
+                            <div class="alert alert-success bg-glass border-secondary">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="fas fa-check me-2"></i>Booking Details
+                                </h6>
+                                <div class="row text-start">
+                                    <div class="col-md-6">
+                                        <small class="d-block"><strong>Event:</strong> ${event.title}</small>
+                                        <small class="d-block"><strong>Date:</strong> ${event.date}</small>
+                                        <small class="d-block"><strong>Time:</strong> ${event.time}${event.end_time ? ' - ' + event.end_time : ''}</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="d-block"><strong>Tickets:</strong> ${formData.tickets}</small>
+                                        <small class="d-block"><strong>Total Price:</strong> $${(parseFloat(event.price) * formData.tickets).toFixed(2)}</small>
+                                        <small class="d-block"><strong>Remaining Seats:</strong> ${data.remaining_seats}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-admin" onclick="bootstrap.Modal.getInstance(document.getElementById('eventDetailsModal')).hide()">
+                                    <i class="fas fa-times me-2"></i>Close
+                                </button>
+                                <button type="button" class="btn btn-outline-light" onclick="location.reload()">
+                                    <i class="fas fa-sync me-2"></i>Refresh Page
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('eventDetailsContent').innerHTML = successContent;
+                    
+                    // Update the card display if we're still on the page
+                    setTimeout(() => {
+                        updateEventCardDisplay(event.id, data.remaining_seats);
+                    }, 1000);
+                    
+                } else {
+                    // Show error message
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    
+                    const errorContent = `
+                        <div class="alert alert-danger bg-glass border-secondary">
+                            <h6 class="fw-bold mb-2">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Booking Failed
+                            </h6>
+                            <p class="mb-0">${data.message}</p>
+                        </div>
+                        <button type="button" class="btn btn-outline-light" onclick="showBookingContactForm(${JSON.stringify(event).replace(/"/g, '&quot;')})">
+                            <i class="fas fa-arrow-left me-2"></i>Try Again
+                        </button>
+                    `;
+                    
+                    document.getElementById('eventDetailsContent').innerHTML = errorContent;
+                }
+            })
+            .catch(error => {
+                console.error('Booking error:', error);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                const errorContent = `
+                    <div class="alert alert-danger bg-glass border-secondary">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Connection Error
+                        </h6>
+                        <p class="mb-0">Unable to process booking. Please check your connection and try again.</p>
+                    </div>
+                    <button type="button" class="btn btn-outline-light" onclick="showBookingContactForm(${JSON.stringify(event).replace(/"/g, '&quot;')})">
+                        <i class="fas fa-arrow-left me-2"></i>Try Again
+                    </button>
+                `;
+                
+                document.getElementById('eventDetailsContent').innerHTML = errorContent;
+            });
+        });
+    }
+    
+    // Update event card display after booking
+    function updateEventCardDisplay(eventId, remainingSeats) {
+        // Find and update the event card if it exists on the page
+        // Update seat count display if needed
+        const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
+        
+        // Also update the events data in the page
+        const events = [
+            {% for event in events %}
+            {
+                id: {{ event.id }},
+                available_seats: {{ event.available_seats or (event.total_seats or 100) }}
+            },
+            {% endfor %}
+        ];
+        
+        const eventIndex = events.findIndex(e => e.id === eventId);
+        if (eventIndex !== -1) {
+            events[eventIndex].available_seats = remainingSeats;
+        }
+    }
+    
+    // Category filtering functions
+    function filterByCategory(genre) {
+        const allEvents = document.querySelectorAll('.event-item');
+        const showAllBtn = document.getElementById('showAllBtn');
+        
+        // Hide all events first
+        allEvents.forEach(event => {
+            event.style.display = 'none';
+        });
+        
+        // Show only events matching the selected genre
+        const filteredEvents = document.querySelectorAll(`.event-item[data-genre="${genre}"]`);
+        filteredEvents.forEach(event => {
+            event.style.display = 'block';
+        });
+        
+        // Show the "Show All Events" button
+        showAllBtn.style.display = 'inline-block';
+        
+        // Scroll to events section
+        document.getElementById('events').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function showAllEvents() {
+        const allEvents = document.querySelectorAll('.event-item');
+        const showAllBtn = document.getElementById('showAllBtn');
+        
+        // Show all events
+        allEvents.forEach(event => {
+            event.style.display = 'block';
+        });
+        
+        // Hide the "Show All Events" button
+        showAllBtn.style.display = 'none';
+    }
+</script>
+{% endblock %}

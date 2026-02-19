@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - Book Hive{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    <div class="mb-3">
+        <a href="{{ url_for('user_profile') }}" class="btn back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Back to My Profile
+        </a>
+    </div>
+    
+    
+    <div class="settings-header">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold mb-2">Settings</h1>
+            <p class="lead">Manage your preferences and notification settings</p>
+        </div>
+    </div>
+
+    <form method="POST">
+        
+        <div class="settings-section">
+            <h3 class="section-title">
+                <i class="fas fa-bell me-2"></i>Notification Preferences
+            </h3>
+            
+            <div class="alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Control how and when you receive notifications from BookHive
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Email Notifications</div>
+                    <div class="setting-description">Receive booking confirmations, reminders, and updates via email</div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="email_notifications" 
+                           name="email_notifications" {% if preferences.email_notifications %}checked{% endif %} />
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">SMS Notifications</div>
+                    <div class="setting-description">Get urgent updates and reminders via text message</div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="sms_notifications" 
+                           name="sms_notifications" {% if preferences.sms_notifications %}checked{% endif %} />
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Booking Reminders</div>
+                    <div class="setting-description">Receive reminders before your upcoming events</div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="booking_reminders" 
+                           name="booking_reminders" {% if preferences.booking_reminders %}checked{% endif %} />
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Event Recommendations</div>
+                    <div class="setting-description">Get personalized event suggestions based on your interests</div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="event_recommendations" 
+                           name="event_recommendations" {% if preferences.event_recommendations %}checked{% endif %} />
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Promotional Emails</div>
+                    <div class="setting-description">Receive special offers and promotions from BookHive</div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="promotional_emails" 
+                           name="promotional_emails" {% if preferences.promotional_emails %}checked{% endif %} />
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-title">Newsletter Subscription</div>
+                    <div class="setting-description">Monthly newsletter with featured events and community highlights</div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="newsletter_subscription" 
+                           name="newsletter_subscription" {% if preferences.newsletter_subscription %}checked{% endif %} />
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="settings-section">
+            <h3 class="section-title">
+                <i class="fas fa-palette me-2"></i>Display Preferences
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="language_preference" class="form-label">Language</label>
+                    <select class="form-select" id="language_preference" name="language_preference">
+                        <option value="en" {% if preferences.language_preference == 'en' %}selected{% endif %}>English</option>
+                        <option value="es" {% if preferences.language_preference == 'es' %}selected{% endif %}>Español</option>
+                        <option value="fr" {% if preferences.language_preference == 'fr' %}selected{% endif %}>Français</option>
+                        <option value="de" {% if preferences.language_preference == 'de' %}selected{% endif %}>Deutsch</option>
+                        <option value="it" {% if preferences.language_preference == 'it' %}selected{% endif %}>Italiano</option>
+                        <option value="pt" {% if preferences.language_preference == 'pt' %}selected{% endif %}>Português</option>
+                        <option value="zh" {% if preferences.language_preference == 'zh' %}selected{% endif %}>中文</option>
+                        <option value="ja" {% if preferences.language_preference == 'ja' %}selected{% endif %}>日本語</option>
+                    </select>
+                    <div class="help-text">Choose your preferred language for the interface</div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="timezone" class="form-label">Timezone</label>
+                    <select class="form-select" id="timezone" name="timezone">
+                        <option value="UTC" {% if preferences.timezone == 'UTC' %}selected{% endif %}>UTC (Coordinated Universal Time)</option>
+                        <option value="America/New_York" {% if preferences.timezone == 'America/New_York' %}selected{% endif %}>Eastern Time (ET)</option>
+                        <option value="America/Chicago" {% if preferences.timezone == 'America/Chicago' %}selected{% endif %}>Central Time (CT)</option>
+                        <option value="America/Denver" {% if preferences.timezone == 'America/Denver' %}selected{% endif %}>Mountain Time (MT)</option>
+                        <option value="America/Los_Angeles" {% if preferences.timezone == 'America/Los_Angeles' %}selected{% endif %}>Pacific Time (PT)</option>
+                        <option value="Europe/London" {% if preferences.timezone == 'Europe/London' %}selected{% endif %}>London (GMT/BST)</option>
+                        <option value="Europe/Paris" {% if preferences.timezone == 'Europe/Paris' %}selected{% endif %}>Paris (CET/CEST)</option>
+                        <option value="Asia/Tokyo" {% if preferences.timezone == 'Asia/Tokyo' %}selected{% endif %}>Tokyo (JST)</option>
+                        <option value="Asia/Shanghai" {% if preferences.timezone == 'Asia/Shanghai' %}selected{% endif %}>Shanghai (CST)</option>
+                        <option value="Asia/Kolkata" {% if preferences.timezone == 'Asia/Kolkata' %}selected{% endif %}>India (IST)</option>
+                        <option value="Australia/Sydney" {% if preferences.timezone == 'Australia/Sydney' %}selected{% endif %}>Sydney (AEDT/AEST)</option>
+                    </select>
+                    <div class="help-text">Set your local timezone for event times</div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="currency_preference" class="form-label">Currency</label>
+                    <select class="form-select" id="currency_preference" name="currency_preference">
+                        <option value="USD" {% if preferences.currency_preference == 'USD' %}selected{% endif %}>USD - US Dollar ($)</option>
+                        <option value="EUR" {% if preferences.currency_preference == 'EUR' %}selected{% endif %}>EUR - Euro (€)</option>
+                        <option value="GBP" {% if preferences.currency_preference == 'GBP' %}selected{% endif %}>GBP - British Pound (£)</option>
+                        <option value="CAD" {% if preferences.currency_preference == 'CAD' %}selected{% endif %}>CAD - Canadian Dollar ($)</option>
+                        <option value="AUD" {% if preferences.currency_preference == 'AUD' %}selected{% endif %}>AUD - Australian Dollar ($)</option>
+                        <option value="JPY" {% if preferences.currency_preference == 'JPY' %}selected{% endif %}>JPY - Japanese Yen (¥)</option>
+                        <option value="CNY" {% if preferences.currency_preference == 'CNY' %}selected{% endif %}>CNY - Chinese Yuan (¥)</option>
+                        <option value="INR" {% if preferences.currency_preference == 'INR' %}selected{% endif %}>INR - Indian Rupee (₹)</option>
+                    </select>
+                    <div class="help-text">Display prices in your preferred currency</div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="theme_preference" class="form-label">Theme</label>
+                    <select class="form-select" id="theme_preference" name="theme_preference">
+                        <option value="auto" {% if preferences.theme_preference == 'auto' %}selected{% endif %}>Auto (System Preference)</option>
+                        <option value="light" {% if preferences.theme_preference == 'light' %}selected{% endif %}>Light Theme</option>
+                        <option value="dark" {% if preferences.theme_preference == 'dark' %}selected{% endif %}>Dark Theme</option>
+                    </select>
+                    <div class="help-text">Choose your preferred visual theme</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary-custom btn-lg me-3">
+                <i class="fas fa-save me-2"></i>Save Settings
+            </button>
+            <a href="{{ url_for('user_profile') }}" class="btn btn-secondary-custom btn-lg">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Form validation and submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    // Show loading state
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+    submitBtn.disabled = true;
+    
+    // Simulate saving (in real app, this would be handled by the form submission)
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 1000);
+});
+
+// Toggle switches animation
+document.querySelectorAll('.form-check-input').forEach(toggle => {
+    toggle.addEventListener('change', function() {
+        const settingItem = this.closest('.setting-item');
+        if (this.checked) {
+            settingItem.style.background = 'rgba(16, 185, 129, 0.05)';
+            setTimeout(() => {
+                settingItem.style.background = 'transparent';
+            }, 300);
+        }
+    });
+});
+
+// Preview timezone changes
+document.getElementById('timezone').addEventListener('change', function() {
+    const selectedTimezone = this.options[this.selectedIndex].text;
+    // Timezone changed
+});
+
+// Preview currency changes
+document.getElementById('currency_preference').addEventListener('change', function() {
+    const selectedCurrency = this.options[this.selectedIndex].text;
+    // Currency changed
+});
+</script>
+{% endblock %}

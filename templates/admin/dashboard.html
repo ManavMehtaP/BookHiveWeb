@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Book Hive{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <div class="mb-3">
+        <a href="{{ url_for('home') }}" class="btn back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Back to Home
+        </a>
+    </div>
+    
+    
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center admin-welcome">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="fas fa-tachometer-alt me-3" style="color: var(--primary-orange);"></i>
+                    Admin Dashboard
+                </h1>
+                <p class="lead text-muted">
+                    <i class="fas fa-user me-2"></i>Welcome back, <strong>{{ session.username }}</strong>! Manage your events with style.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-number">{{ events|length }}</div>
+            <div class="stat-label">Total Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ events|selectattr('featured')|list|length }}</div>
+            <div class="stat-label">Featured Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_bookings }}</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">${{ "%.2f"|format(stats.total_revenue) }}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+    </div>
+
+    
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4 col-md-6">
+            <a href="{{ url_for('add_event') }}" class="text-decoration-none">
+                <div class="dashboard-card add-event">
+                    <div>
+                        <div class="dashboard-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Add Event</h3>
+                        <br>
+                    </div>
+                    <div class="action-btn" style="background: var(--primary-gradient); color: white; border: none;">
+                        <i class="fas fa-plus me-2"></i>Create Event
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <a href="{{ url_for('manage_events') }}" class="text-decoration-none">
+                <div class="dashboard-card manage-events">
+                    <div>
+                        <div class="dashboard-icon">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Manage Events</h3>
+                        <br>
+                    </div>
+                    <div class="action-btn" style="background: linear-gradient(135deg, var(--accent-purple), #8b5cf6); color: white; border: none;">
+                        <i class="fas fa-tasks me-2"></i>Manage Events
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <a href="#" class="text-decoration-none">
+                <div class="dashboard-card view-bookings">
+                    <div>
+                        <div class="dashboard-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">View Bookings</h3>
+                        <br>
+                    </div>
+                    <div class="action-btn" style="background: linear-gradient(135deg, var(--accent-blue), #2563eb); color: white; border: none;">
+                        <i class="fas fa-list me-2"></i>View Bookings
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

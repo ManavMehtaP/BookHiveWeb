@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Book Hive{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    <div class="mb-3">
+        <a href="{{ url_for('home') }}" class="btn back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Back to Home
+        </a>
+    </div>
+    
+    
+    <div class="profile-header">
+        <div class="text-center">
+            <div class="profile-picture-container">
+                {% if profile.profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/' + profile.profile_picture) }}" 
+                         alt="Profile Picture" class="profile-picture" />
+                {% else %}
+                    <div class="profile-picture">
+                        <i class="fas fa-user"></i>
+                    </div>
+                {% endif %}
+                <div class="profile-picture-overlay" onclick="document.getElementById('profilePictureInput').click()">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <input type="file" id="profilePictureInput" style="display: none;" accept="image/*">
+            </div>
+            <h1 class="display-5 fw-bold mb-2">{{ user.full_name or user.username }}</h1>
+            <p class="lead mb-0">@{{ user.username }}</p>
+            <p class="mb-3">{{ user.email }}</p>
+            <div class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('edit_profile') }}" class="action-btn btn-primary-custom">
+                    <i class="fas fa-edit me-2"></i>Edit Profile
+                </a>
+                <a href="{{ url_for('profile_settings') }}" class="action-btn btn-secondary-custom">
+                    <i class="fas fa-cog me-2"></i>Settings
+                </a>
+                <a href="{{ url_for('profile_security') }}" class="action-btn btn-secondary-custom">
+                    <i class="fas fa-shield-alt me-2"></i>Security
+                </a>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-number">{{ statistics.total_bookings or 0 }}</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-number">${{ statistics.total_spent or 0 }}</div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-number">{{ statistics.upcoming_bookings or 0 }}</div>
+                <div class="stat-label">Upcoming</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-number">{{ statistics.favorite_category or 'N/A' }}</div>
+                <div class="stat-label">Favorite Category</div>
+            </div>
+        </div>
+    </div>
+
+    
+    <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab">
+                <i class="fas fa-ticket-alt me-2"></i>Recent Bookings
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">
+                <i class="fas fa-star me-2"></i>My Reviews
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab">
+                <i class="fas fa-info-circle me-2"></i>About
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="profileTabsContent">
+        
+        <div class="tab-pane fade show active" id="bookings" role="tabpanel">
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-ticket-alt me-2"></i>Recent Bookings
+                </h3>
+                {% if recent_bookings %}
+                    {% for booking in recent_bookings %}
+                        <div class="booking-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h5 class="mb-1">{{ booking.title }}</h5>
+                                    <p class="text-muted mb-1">
+                                        <i class="fas fa-calendar me-2"></i>{{ booking.event_date }}
+                                        <i class="fas fa-clock ms-3 me-2"></i>{{ booking.event_time }}
+                                    </p>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-map-marker-alt me-2"></i>{{ booking.location }}
+                                    </p>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <span class="booking-status 
+                                        {% if booking.event_date >= now().date() %}status-upcoming{% else %}status-past{% endif %}">
+                                        {% if booking.event_date >= now().date() %}Upcoming{% else %}Past{% endif %}
+                                    </span>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <p class="mb-1"><strong>{{ booking.seats_booked }} tickets</strong></p>
+                                    <p class="mb-0">${{ booking.total_price }}</p>
+                                    {% if booking.event_date >= now().date() %}
+                                        <button class="action-btn btn-primary-custom btn-sm mt-2" 
+                                                onclick="showReviewModal({{ booking.event_id }}, {{ booking.id }})">
+                                            <i class="fas fa-star me-1"></i>Review
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5 profile-empty-state">
+                        <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No bookings yet</h4>
+                        <p class="text-muted">Start exploring events and book your first experience!</p>
+                        <a href="{{ url_for('home') }}" class="action-btn btn-primary-custom">
+                            <i class="fas fa-search me-2"></i>Browse Events
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        
+        <div class="tab-pane fade" id="reviews" role="tabpanel">
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-star me-2"></i>My Reviews
+                </h3>
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5>{{ review.event_title }}</h5>
+                                <div class="rating-stars">
+                                    {% for i in range(5) %}
+                                        {% if i < review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% if review.review_title %}
+                                <h6 class="mb-2">{{ review.review_title }}</h6>
+                            {% endif %}
+                            <p class="text-muted mb-2">{{ review.review_text }}</p>
+                            <small class="text-muted">
+                                {{ review.created_at.strftime('%B %d, %Y') }}
+                                {% if review.would_recommend %}
+                                    <span class="ms-2"><i class="fas fa-thumbs-up"></i> Would recommend</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5 profile-empty-state">
+                        <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No reviews yet</h4>
+                        <p class="text-muted">Share your experience after attending events!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        
+        <div class="tab-pane fade" id="about" role="tabpanel">
+            <div class="about-section">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>About Me
+                </h3>
+                <div class="info-grid">
+                    <div class="info-section">
+                        <h5>Personal Information</h5>
+                        <table class="info-table">
+                            <tr>
+                                <td>Full Name:</td>
+                                <td>{{ user.full_name or 'Not set' }}</td>
+                            </tr>
+                            <tr>
+                                <td>Username:</td>
+                                <td>{{ user.username }}</td>
+                            </tr>
+                            <tr>
+                                <td>Email:</td>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <td>Phone:</td>
+                                <td>{{ user.phone or 'Not set' }}</td>
+                            </tr>
+                            <tr>
+                                <td>Member Since:</td>
+                                <td>{{ user.created_at.strftime('%B %d, %Y') }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="info-section">
+                        <h5>Preferences</h5>
+                        <table class="info-table">
+                            <tr>
+                                <td>Email Notifications:</td>
+                                <td>
+                                    <div class="preference-status">
+                                        {% if preferences.email_notifications %}
+                                            <i class="fas fa-check-circle status-enabled"></i>
+                                            <span>Enabled</span>
+                                        {% else %}
+                                            <i class="fas fa-times-circle status-disabled"></i>
+                                            <span>Disabled</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Booking Reminders:</td>
+                                <td>
+                                    <div class="preference-status">
+                                        {% if preferences.booking_reminders %}
+                                            <i class="fas fa-check-circle status-enabled"></i>
+                                            <span>Enabled</span>
+                                        {% else %}
+                                            <i class="fas fa-times-circle status-disabled"></i>
+                                            <span>Disabled</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Language:</td>
+                                <td>{{ preferences.language_preference|title or 'English' }}</td>
+                            </tr>
+                            <tr>
+                                <td>Timezone:</td>
+                                <td>{{ preferences.timezone or 'UTC' }}</td>
+                            </tr>
+                            <tr>
+                                <td>Currency:</td>
+                                <td>{{ preferences.currency_preference or 'USD' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if profile.bio %}
+                    <div class="bio-section">
+                        <h5>Bio</h5>
+                        <p>{{ profile.bio }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Review Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    <input type="hidden" id="reviewEventId">
+                    <input type="hidden" id="reviewBookingId">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Rating</label>
+                        <div class="rating-stars-input">
+                            {% for i in range(5) %}
+                                <i class="fas fa-star rating-star" data-rating="{{ 5 - i }}"></i>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" id="ratingValue" value="5" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="reviewTitle" class="form-label">Review Title (Optional)</label>
+                        <input type="text" class="form-control" id="reviewTitle">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="reviewText" class="form-label">Your Review</label>
+                        <textarea class="form-control" id="reviewText" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="wouldRecommend">
+                            <label class="form-check-label" for="wouldRecommend">
+                                I would recommend this event
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Profile picture upload
+document.getElementById('profilePictureInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        
+        fetch('/profile/upload-picture', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error uploading picture: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error uploading picture');
+        });
+    }
+});
+
+// Review functionality
+function showReviewModal(eventId, bookingId) {
+    document.getElementById('reviewEventId').value = eventId;
+    document.getElementById('reviewBookingId').value = bookingId;
+    document.getElementById('ratingValue').value = 5;
+    updateRatingStars(5);
+    document.getElementById('reviewTitle').value = '';
+    document.getElementById('reviewText').value = '';
+    document.getElementById('wouldRecommend').checked = false;
+    
+    new bootstrap.Modal(document.getElementById('reviewModal')).show();
+}
+
+// Rating stars interaction
+document.querySelectorAll('.rating-star').forEach(star => {
+    star.addEventListener('click', function() {
+        const rating = parseInt(this.dataset.rating);
+        document.getElementById('ratingValue').value = rating;
+        updateRatingStars(rating);
+    });
+    
+    star.addEventListener('mouseenter', function() {
+        const rating = parseInt(this.dataset.rating);
+        updateRatingStars(rating);
+    });
+});
+
+document.querySelector('.rating-stars-input').addEventListener('mouseleave', function() {
+    const currentRating = parseInt(document.getElementById('ratingValue').value);
+    updateRatingStars(currentRating);
+});
+
+function updateRatingStars(rating) {
+    document.querySelectorAll('.rating-star').forEach((star, index) => {
+        if (index < rating) {
+            star.classList.remove('far');
+            star.classList.add('fas');
+        } else {
+            star.classList.remove('fas');
+            star.classList.add('far');
+        }
+    });
+}
+
+function submitReview() {
+    const eventId = document.getElementById('reviewEventId').value;
+    const bookingId = document.getElementById('reviewBookingId').value;
+    const rating = document.getElementById('ratingValue').value;
+    const reviewTitle = document.getElementById('reviewTitle').value;
+    const reviewText = document.getElementById('reviewText').value;
+    const wouldRecommend = document.getElementById('wouldRecommend').checked;
+    
+    if (!reviewText.trim()) {
+        alert('Please write a review');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('event_id', eventId);
+    formData.append('booking_id', bookingId);
+    formData.append('rating', rating);
+    formData.append('review_title', reviewTitle);
+    formData.append('review_text', reviewText);
+    formData.append('would_recommend', wouldRecommend);
+    
+    fetch('/profile/add-review', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
+            location.reload();
+        } else {
+            alert('Error submitting review: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error submitting review');
+    });
+}
+</script>
+{% endblock %}

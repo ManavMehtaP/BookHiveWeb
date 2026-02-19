@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Events - Book Hive{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manage_events.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="alert-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Manage Your Events</h2>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn back-btn">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+            
+            {% if events %}
+            <div class="table-responsive">
+                <table class="table table-dark table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-calendar me-2"></i>Event</th>
+                            <th><i class="fas fa-tag me-2"></i>Genre</th>
+                            <th><i class="fas fa-map-marker-alt me-2"></i>Location</th>
+                            <th><i class="fas fa-clock me-2"></i>Date & Time</th>
+                            <th><i class="fas fa-dollar-sign me-2"></i>Price</th>
+                            <th><i class="fas fa-users me-2"></i>Seats</th>
+                            <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if event.image_url %}
+                                    <img src="{{ event.image_url }}" alt="{{ event.title }}" 
+                                         class="event-thumbnail me-3">
+                                    {% endif %}
+                                    <div>
+                                        <strong class="text-white">{{ event.title }}</strong>
+                                        {% if event.featured %}
+                                        <span class="badge bg-warning text-white ms-2 badge-custom" style="color: #ffffff !important; font-weight: 700;">
+                                            <i class="fas fa-star me-1" style="color: #ffffff !important;"></i>Featured
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% set badge_class = 'badge-' + event.genre.lower().replace(' & ', '-').replace(' ', '-') %}
+                                <span class="badge {{ badge_class }} badge-custom">
+                                    {{ event.genre }}
+                                </span>
+                            </td>
+                            <td>
+                                <i class="fas fa-map-pin text-orange me-2"></i>
+                                <span class="text-white">{{ event.location }}</span>
+                            </td>
+                            <td>
+                                <div class="text-white">
+                                    <i class="fas fa-calendar-day text-orange me-2"></i>{{ event.date }}
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock text-orange me-1"></i>{{ event.time }}
+                                </small>
+                            </td>
+                            <td>
+                                <span class="text-success fw-bold">${{ "%.2f"|format(event.price) }}</span>
+                            </td>
+                            <td>
+                                <div class="text-white">
+                                    <small>{{ event.available_seats }}/{{ event.total_seats }}</small>
+                                </div>
+                                <div class="progress" style="height: 6px; margin-top: 4px;">
+                                    {% set percentage = (event.total_seats - event.available_seats) / event.total_seats * 100 %}
+                                    <div class="progress-bar bg-{{ 'success' if percentage < 50 else 'warning' if percentage < 80 else 'danger' }}" 
+                                         style="width: {{ percentage }}%"></div>
+                                </div>
+                                <small class="text-muted">{{ "%.0f"|format(percentage) }}% booked</small>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('edit_event', event_id=event.id) }}" 
+                                       class="btn btn-sm btn-outline-admin">
+                                        <i class="fas fa-edit me-1"></i> Edit
+                                    </a>
+                                    <form method="POST" action="{{ url_for('delete_event', event_id=event.id) }}" 
+                                          style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this event?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash me-1"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">No Events Found</h4>
+                <p class="text-muted">You haven't created any events yet.</p>
+                <a href="{{ url_for('add_event') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea, #ea580c); border: none; font-weight: 600; padding: 12px 24px;">
+                    <i class="fas fa-plus me-2"></i>Create Your First Event
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
