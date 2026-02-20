@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service - Book Hive{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/privacy.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="admin-card p-5">
+                    <h1 class="text-white mb-4">Terms of Service</h1>
+                    <p class="text-white mb-4">Last updated: {{ now().strftime('%B %d, %Y') }}</p>
+                    
+                    <div class="text-white">
+                        <h2 class="h4 mb-3">1. Acceptance of Terms</h2>
+                        <p class="mb-4">By accessing and using Book Hive, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+
+                        <h2 class="h4 mb-3">2. Description of Service</h2>
+                        <p class="mb-4">Book Hive is an online platform that allows users to discover, browse, and book tickets for various events including concerts, festivals, sports events, and cultural activities. We act as an intermediary between event organizers and attendees.</p>
+
+                        <h2 class="h4 mb-3">3. User Accounts</h2>
+                        <p class="mb-4">To access certain features, you must create an account. You agree to:</p>
+                        <ul class="mb-4">
+                            <li>Provide accurate, current, and complete information</li>
+                            <li>Maintain and update your account information</li>
+                            <li>Keep your password confidential</li>
+                            <li>Accept responsibility for all activities under your account</li>
+                            <li>Notify us immediately of any unauthorized use</li>
+                        </ul>
+
+                        <h2 class="h4 mb-3">4. Booking and Payment</h2>
+                        <p class="mb-4">When you book an event through our platform:</p>
+                        <ul class="mb-4">
+                            <li>You agree to provide accurate payment information</li>
+                            <li>You authorize us to charge the specified amount</li>
+                            <li>All sales are final unless otherwise specified by the event organizer</li>
+                            <li>You must comply with event-specific terms and conditions</li>
+                            <li>Booking confirmation is subject to availability</li>
+                        </ul>
+
+                        <h2 class="h4 mb-3">5. User Conduct</h2>
+                        <p class="mb-4">You agree not to:</p>
+                        <ul class="mb-4">
+                            <li>Use the service for any illegal or unauthorized purpose</li>
+                            <li>Provide false or misleading information</li>
+                            <li>Attempt to gain unauthorized access to our systems</li>
+                            <li>Interfere with or disrupt the service</li>
+                            <li>Harass or abuse other users</li>
+                            <li>Violate any applicable laws or regulations</li>
+                        </ul>
+
+                        <h2 class="h4 mb-3">6. Cancellation and Refunds</h2>
+                        <p class="mb-4">Cancellation and refund policies vary by event and are determined by the event organizer. Book Hive is not responsible for event cancellations. Refund requests must be made according to the specific event's policy.</p>
+
+                        <h2 class="h4 mb-3">7. Intellectual Property</h2>
+                        <p class="mb-4">All content, trademarks, service marks, logos, and trade dress on the Book Hive platform are the exclusive property of Book Hive or its licensors. You may not use, copy, reproduce, or distribute any of this content without our express written permission.</p>
+
+                        <h2 class="h4 mb-3">8. Limitation of Liability</h2>
+                        <p class="mb-4">Book Hive shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the service.</p>
+
+                        <h2 class="h4 mb-3">9. Indemnification</h2>
+                        <p class="mb-4">You agree to indemnify and hold Book Hive harmless from any claim, demand, or damage, including reasonable attorneys' fees, asserted by any third party due to or arising out of your use of the service.</p>
+
+                        <h2 class="h4 mb-3">10. Termination</h2>
+                        <p class="mb-4">We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
+
+                        <h2 class="h4 mb-3">11. Governing Law</h2>
+                        <p class="mb-4">These Terms shall be interpreted and governed by the laws of the jurisdiction in which Book Hive operates, without regard to conflict of law provisions.</p>
+
+                        <h2 class="h4 mb-3">12. Changes to Terms</h2>
+                        <p class="mb-4">We reserve the right to modify these terms at any time. If we do, we will post the updated terms on this page and update the "Last updated" date.</p>
+
+                        <h2 class="h4 mb-3">13. Contact Information</h2>
+                        <p class="mb-4">If you have any questions about these Terms of Service, please contact us:</p>
+                        <p class="mb-4">
+                            <strong>Email:</strong> legal@bookhive.com<br>
+                            <strong>Phone:</strong> +1 (555) 123-4567<br>
+                            <strong>Address:</strong> 123 Event Street, New York, NY 10001
+                        </p>
+                        
+                        <div class="text-center mt-5">
+                            <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-home me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

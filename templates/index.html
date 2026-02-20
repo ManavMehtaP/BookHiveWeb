@@ -114,6 +114,7 @@
                         <img src="{{ event.image_url }}" alt="{{ event.title }}" loading="lazy">
                     </div>
                     <div class="card-content text-white">
+                        <h5 class="card-title mb-2">{{ event.title }}</h5>
                         <div class="card-info-line">
                             <i class="fas fa-map-marker-alt text-orange"></i>
                             <span>{{ event.location }}</span>
@@ -492,8 +493,8 @@
                         <input type="tel" class="form-control bg-dark text-white border-secondary" 
                                id="phone" name="phone" 
                                value="{{ session.get('user_phone', '') }}" 
-                               placeholder="Enter your phone number" required
-                               pattern="[6-9]\d{9}" maxlength="10">
+                               placeholder="Enter your phone number (10-15 digits)" required
+                               pattern="[0-9+\-\s\(\)]{10,20}" title="Enter a valid phone number (10-15 digits)">
                     </div>
                     
                     <div class="col-md-6 mb-3">
@@ -542,12 +543,14 @@
             
             // Get form data
             const phone = document.getElementById('phone').value;
-            const phoneRegex = /^[6-9]\d{9}$/;
+            // Flexible phone validation - accepts international formats
+            const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
+            const phoneRegex = /^\d{10,15}$/;
             const tickets = document.getElementById('tickets').value;
             
             // Validate phone number
-            if (!phoneRegex.test(phone)) {
-                alert('Please enter a valid 10-digit mobile number starting with 6-9.');
+            if (!phoneRegex.test(cleanPhone)) {
+                alert('Please enter a valid phone number (10-15 digits). International formats accepted.');
                 return;
             }
             
@@ -561,7 +564,7 @@
                 event_id: event.id,
                 name: "{{ session.username if session.get('username') else '' }}",
                 email: document.getElementById('email').value,
-                phone: phone,
+                phone: cleanPhone,  // Send cleaned phone number
                 tickets: tickets,
                 requests: ""  // No requests field
             };

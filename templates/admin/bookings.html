@@ -4,315 +4,389 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            <i class="fas fa-ticket-alt me-2"></i>
-            Manage Bookings
-        </h2>
-        <div class="d-flex gap-2">
-            <select class="form-select" id="statusFilter" style="width: auto;">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
-            <select class="form-select" id="paymentFilter" style="width: auto;">
-                <option value="">All Payment</option>
-                <option value="paid">Paid</option>
-                <option value="refunded">Refunded</option>
-            </select>
+    <div class="mb-3">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+    
+    <!-- Page Title -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-white mb-3">
+            <i class="fas fa-chart-line me-3" style="color: var(--primary-orange);"></i>
+            Booking Analytics Dashboard
+        </h1>
+        <p class="lead text-muted">
+            Comprehensive insights into your event booking performance
+        </p>
+    </div>
+    
+        
+    <!-- Analytics Summary Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="analytics-content">
+                    <h5>Total Sales</h5>
+                    <p class="analytics-value">${{ "%.2f"|format(stats.total_revenue if stats.total_revenue else 0) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="analytics-content">
+                    <h5>Total Bookings</h5>
+                    <p class="analytics-value">{{ stats.total_bookings if stats.total_bookings else 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="analytics-content">
+                    <h5>Avg. Ticket Price</h5>
+                    <p class="analytics-value">${{ "%.2f"|format((stats.total_revenue / stats.total_bookings) if stats.total_bookings > 0 else 0) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="analytics-content">
+                    <h5>Active Events</h5>
+                    <p class="analytics-value">{{ events|length if events else 0 }}</p>
+                </div>
+            </div>
         </div>
     </div>
     
-    {% if bookings %}
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Booking ID</th>
-                        <th>Reference</th>
-                        <th>Event</th>
-                        <th>Customer</th>
-                        <th>User</th>
-                        <th>Seats</th>
-                        <th>Total Price</th>
-                        <th>Status</th>
-                        <th>Payment</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for booking in bookings %}
-                        <tr data-status="{{ booking.booking_status }}" data-payment="{{ booking.payment_status or 'paid' }}">
-                            <td>{{ booking.id }}</td>
-                            <td>
-                                {% if booking.booking_reference %}
-                                    <code>{{ booking.booking_reference }}</code>
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div>
-                                    <strong>{{ booking.title }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ booking.event_date }} {{ booking.event_time[:5] }}</small>
-                                    <br>
-                                    <small class="text-muted">{{ booking.location }}</small>
-                                </div>
-                            </td>
-                            <td>
-                                <div>
-                                    <strong>{{ booking.customer_name }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ booking.customer_email }}</small>
-                                    <br>
-                                    <small class="text-muted">{{ booking.phone }}</small>
-                                </div>
-                            </td>
-                            <td>
-                                {% if booking.username %}
-                                    <div>
-                                        <strong>{{ booking.username }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ booking.user_full_name or '' }}</small>
-                                    </div>
-                                {% else %}
-                                    <span class="badge bg-secondary">Guest</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ booking.seats_booked }}</td>
-                            <td>${{ "%.2f"|format(booking.total_price) }}</td>
-                            <td>
-                                <span class="badge bg-{{ 'success' if booking.booking_status == 'active' else 'danger' }}">
-                                    {{ booking.booking_status.title() }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge bg-{{ 'success' if booking.payment_status == 'paid' else 'info' }}">
-                                    {{ (booking.payment_status or 'paid').title() }}
-                                </span>
-                            </td>
-                            <td>{{ booking.booking_date[:10] }}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <button class="btn btn-outline-primary view-booking" 
-                                            data-booking-id="{{ booking.id }}"
-                                            title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-outline-secondary edit-booking" 
-                                            data-booking-id="{{ booking.id }}"
-                                            data-current-status="{{ booking.booking_status }}"
-                                            data-current-payment="{{ booking.payment_status or 'paid' }}"
-                                            title="Edit Status">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
-            <h4 class="text-muted">No bookings found</h4>
-            <p class="text-muted">No bookings have been made yet.</p>
-        </div>
-    {% endif %}
-</div>
-
-
-<div class="modal fade" id="bookingDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Booking Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="bookingDetailsContent">
+    <!-- Analytics Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="admin-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="text-white mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Booking Analytics Dashboard
+                    </h3>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-light btn-sm" onclick="refreshCharts()">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh Charts
+                        </button>
+                    </div>
+                </div>
                 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal fade" id="editBookingModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update Booking Status</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editBookingForm">
-                    <div class="mb-3">
-                        <label for="bookingStatus" class="form-label">Booking Status</label>
-                        <select class="form-select" id="bookingStatus" required>
-                            <option value="active">Active</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
+                {% if charts %}
+                    <!-- Overall Sales Chart -->
+                    {% if charts.sales_trend_daily %}
+                    <div class="chart-full-width mb-4">
+                        <div class="chart-container enhanced">
+                            <div class="chart-header">
+                                <h5 class="text-white mb-0">
+                                    <i class="fas fa-chart-line me-2"></i>Overall Sales Trend
+                                </h5>
+                                <span class="badge bg-primary">Daily</span>
+                            </div>
+                            <div class="chart-image-wrapper">
+                                <img src="{{ url_for('static', filename='charts/sales_trend_daily.png') }}" 
+                                     class="img-fluid rounded chart-image" alt="Daily Sales Trend">
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="paymentStatus" class="form-label">Payment Status</label>
-                        <select class="form-select" id="paymentStatus" required>
-                            <option value="paid">Paid</option>
-                            <option value="refunded">Refunded</option>
-                        </select>
+                    {% endif %}
+                    
+                    <!-- Genre Sales Chart -->
+                    {% if charts.genre_sales %}
+                    <div class="chart-full-width mb-4">
+                        <div class="chart-container enhanced">
+                            <div class="chart-header">
+                                <h5 class="text-white mb-0">
+                                    <i class="fas fa-chart-bar me-2"></i>Tickets Sales by Genre
+                                </h5>
+                                <span class="badge bg-success">Total</span>
+                            </div>
+                            <div class="chart-image-wrapper">
+                                <img src="{{ url_for('static', filename='charts/genre_sales.png') }}" 
+                                     class="img-fluid rounded chart-image" alt="Genre Sales Chart">
+                            </div>
+                        </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveBookingChanges">
-                    <i class="fas fa-save me-1"></i>Save Changes
-                </button>
+                    {% endif %}
+                    
+                    <!-- Genre Distribution Pie Chart -->
+                    {% if charts.genre_distribution %}
+                    <div class="chart-full-width mb-4">
+                        <div class="chart-container enhanced">
+                            <div class="chart-header">
+                                <h5 class="text-white mb-0">
+                                    <i class="fas fa-chart-pie me-2"></i>Booking Distribution by Genre
+                                </h5>
+                                <span class="badge bg-info">Percentage</span>
+                            </div>
+                            <div class="chart-image-wrapper">
+                                <img src="{{ url_for('static', filename='charts/genre_distribution.png') }}" 
+                                     class="img-fluid rounded chart-image" alt="Genre Distribution Chart">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Top Events Chart -->
+                    {% if charts.top_events %}
+                    <div class="chart-full-width mb-4">
+                        <div class="chart-container enhanced">
+                            <div class="chart-header">
+                                <h5 class="text-white mb-0">
+                                    <i class="fas fa-trophy me-2"></i>Top Events by Revenue
+                                </h5>
+                                <span class="badge bg-warning">Top 10</span>
+                            </div>
+                            <div class="chart-image-wrapper">
+                                <img src="{{ url_for('static', filename='charts/top_events.png') }}" 
+                                     class="img-fluid rounded chart-image" alt="Top Events Chart">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Monthly Sales Trend -->
+                    {% if charts.sales_trend_monthly %}
+                    <div class="chart-full-width mb-4">
+                        <div class="chart-container enhanced">
+                            <div class="chart-header">
+                                <h5 class="text-white mb-0">
+                                    <i class="fas fa-calendar-alt me-2"></i>Monthly Sales Trend
+                                </h5>
+                                <span class="badge bg-secondary">Monthly</span>
+                            </div>
+                            <div class="chart-image-wrapper">
+                                <img src="{{ url_for('static', filename='charts/sales_trend_monthly.png') }}" 
+                                     class="img-fluid rounded chart-image" alt="Monthly Sales Trend">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info text-center py-5">
+                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        <h5>No booking data available for analytics</h5>
+                        <p class="mb-0">Charts will appear once bookings are made. Start by creating events and processing bookings to see detailed analytics.</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
 <script>
+// Charts functionality
 document.addEventListener('DOMContentLoaded', function() {
-    const bookingDetailsModal = new bootstrap.Modal(document.getElementById('bookingDetailsModal'));
-    const editBookingModal = new bootstrap.Modal(document.getElementById('editBookingModal'));
-    let currentBookingId = null;
-    
-    // View booking details
-    document.querySelectorAll('.view-booking').forEach(button => {
-        button.addEventListener('click', function() {
-            const bookingId = this.dataset.bookingId;
-            fetch(`/api/admin/booking-details/${bookingId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        displayBookingDetails(data.booking);
-                        bookingDetailsModal.show();
-                    } else {
-                        alert(data.message || 'Error loading booking details');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error loading booking details');
-                });
-        });
-    });
-    
-    // Edit booking
-    document.querySelectorAll('.edit-booking').forEach(button => {
-        button.addEventListener('click', function() {
-            currentBookingId = this.dataset.bookingId;
-            document.getElementById('bookingStatus').value = this.dataset.currentStatus;
-            document.getElementById('paymentStatus').value = this.dataset.currentPayment;
-            editBookingModal.show();
-        });
-    });
-    
-    // Save booking changes
-    document.getElementById('saveBookingChanges').addEventListener('click', function() {
-        const status = document.getElementById('bookingStatus').value;
-        const paymentStatus = document.getElementById('paymentStatus').value;
-        
-        fetch(`/api/admin/update-booking-status/${currentBookingId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                status: status,
-                payment_status: paymentStatus
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message || 'Error updating booking');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error updating booking');
-        });
-    });
-    
-    // Filter functionality
-    document.getElementById('statusFilter').addEventListener('change', filterBookings);
-    document.getElementById('paymentFilter').addEventListener('change', filterBookings);
-    
-    function filterBookings() {
-        const statusFilter = document.getElementById('statusFilter').value;
-        const paymentFilter = document.getElementById('paymentFilter').value;
-        const rows = document.querySelectorAll('tbody tr');
-        
-        rows.forEach(row => {
-            const status = row.dataset.status;
-            const payment = row.dataset.payment;
-            
-            const statusMatch = !statusFilter || status === statusFilter;
-            const paymentMatch = !paymentFilter || payment === paymentFilter;
-            
-            row.style.display = statusMatch && paymentMatch ? '' : 'none';
-        });
-    }
-    
-    function displayBookingDetails(booking) {
-        const content = `
-            <div class="row">
-                <div class="col-md-6">
-                    <h6>Event Information</h6>
-                    <p><strong>Title:</strong> ${booking.title}</p>
-                    <p><strong>Genre:</strong> ${booking.genre}</p>
-                    <p><strong>Date:</strong> ${booking.event_date}</p>
-                    <p><strong>Time:</strong> ${booking.event_time}</p>
-                    <p><strong>Location:</strong> ${booking.location}</p>
-                    ${booking.venue ? `<p><strong>Venue:</strong> ${booking.venue}</p>` : ''}
-                    <p><strong>Price per seat:</strong> $${parseFloat(booking.event_price).toFixed(2)}</p>
-                </div>
-                <div class="col-md-6">
-                    <h6>Customer Information</h6>
-                    <p><strong>Name:</strong> ${booking.customer_name}</p>
-                    <p><strong>Email:</strong> ${booking.customer_email}</p>
-                    <p><strong>Phone:</strong> ${booking.phone}</p>
-                    ${booking.username ? `
-                        <h6 class="mt-3">User Account</h6>
-                        <p><strong>Username:</strong> ${booking.username}</p>
-                        <p><strong>Full Name:</strong> ${booking.full_name}</p>
-                        <p><strong>Email:</strong> ${booking.email}</p>
-                    ` : '<p class="text-muted">Guest booking (no user account)</p>'}
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <h6>Booking Details</h6>
-                    <p><strong>Booking ID:</strong> ${booking.id}</p>
-                    <p><strong>Reference:</strong> ${booking.booking_reference || 'N/A'}</p>
-                    <p><strong>Seats Booked:</strong> ${booking.seats_booked}</p>
-                    <p><strong>Total Price:</strong> $${parseFloat(booking.total_price).toFixed(2)}</p>
-                    <p><strong>Booking Date:</strong> ${booking.booking_date}</p>
-                    ${booking.notes ? `<p><strong>Notes:</strong> ${booking.notes}</p>` : ''}
-                </div>
-                <div class="col-md-6">
-                    <h6>Status Information</h6>
-                    <p><strong>Booking Status:</strong> <span class="badge bg-${booking.booking_status === 'active' ? 'success' : 'danger'}">${booking.booking_status}</span></p>
-                    <p><strong>Payment Status:</strong> <span class="badge bg-${booking.payment_status === 'paid' ? 'success' : 'info'}">${booking.payment_status}</span></p>
-                    <p><strong>Available Seats:</strong> ${booking.available_seats}</p>
-                    <p><strong>Total Seats:</strong> ${booking.total_seats}</p>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('bookingDetailsContent').innerHTML = content;
-    }
+    console.log('Individual Charts Dashboard loaded');
 });
+
+function refreshCharts() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Refreshing...';
+    button.disabled = true;
+    
+    // Reload page to regenerate charts
+    setTimeout(() => {
+        window.location.reload();
+    }, 1000);
+}
+
+function refreshChartsLive() {
+    // Find the refresh button using its onclick attribute
+    const button = document.querySelector('button[onclick*="refreshChartsLive"]');
+    
+    if (!button) {
+        console.error('Refresh button not found');
+        return;
+    }
+    
+    const originalText = button.innerHTML;
+    const originalDisabled = button.disabled;
+    
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Refreshing Live...';
+    button.disabled = true;
+    
+    // Add visual feedback to all chart containers
+    const chartContainers = document.querySelectorAll('.chart-full-width');
+    chartContainers.forEach(container => {
+        container.style.opacity = '0.5';
+        container.style.transition = 'opacity 0.3s ease';
+    });
+    
+    // Call server to refresh charts with latest database data
+    fetch('/api/admin/refresh-charts-live', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update chart images with new timestamps to force reload
+            const chartImages = document.querySelectorAll('.chart-image');
+            const timestamp = new Date().getTime();
+            
+            chartImages.forEach(img => {
+                const src = img.src;
+                // Add timestamp to force browser to reload
+                if (src.includes('?')) {
+                    img.src = src.split('?')[0] + '?t=' + timestamp;
+                } else {
+                    img.src = src + '?t=' + timestamp;
+                }
+            });
+            
+            // Update analytics cards with new data
+            if (data.stats) {
+                updateAnalyticsCards(data.stats);
+            }
+            
+            // Show success message
+            showNotification('Charts refreshed successfully with latest data!', 'success');
+        } else {
+            showNotification('Error refreshing charts: ' + (data.message || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error refreshing charts. Please try again.', 'error');
+    })
+    .finally(() => {
+        // Restore button state
+        button.innerHTML = originalText;
+        button.disabled = originalDisabled;
+        
+        // Restore chart container opacity
+        chartContainers.forEach(container => {
+            container.style.opacity = '1';
+        });
+    });
+}
+
+function refreshChartsLive() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    const originalDisabled = button.disabled;
+    
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Refreshing Live...';
+    button.disabled = true;
+    
+    // Add visual feedback to all chart containers
+    const chartContainers = document.querySelectorAll('.chart-full-width');
+    chartContainers.forEach(container => {
+        container.style.opacity = '0.5';
+        container.style.transition = 'opacity 0.3s ease';
+    });
+    
+    // Call server to refresh charts with latest database data
+    fetch('/api/admin/refresh-charts-live', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update chart images with new timestamps to force reload
+            const chartImages = document.querySelectorAll('.chart-image');
+            const timestamp = new Date().getTime();
+            
+            chartImages.forEach(img => {
+                const src = img.src;
+                // Add timestamp to force browser to reload the image
+                if (src.includes('?')) {
+                    img.src = src.split('?')[0] + '?t=' + timestamp;
+                } else {
+                    img.src = src + '?t=' + timestamp;
+                }
+            });
+            
+            // Update analytics cards with new data
+            if (data.stats) {
+                updateAnalyticsCards(data.stats);
+            }
+            
+            // Show success message
+            showNotification('Charts refreshed successfully with latest data!', 'success');
+        } else {
+            showNotification('Error refreshing charts: ' + (data.message || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error refreshing charts. Please try again.', 'error');
+    })
+    .finally(() => {
+        // Restore button state
+        button.innerHTML = originalText;
+        button.disabled = originalDisabled;
+        
+        // Restore chart container opacity
+        chartContainers.forEach(container => {
+            container.style.opacity = '1';
+        });
+    });
+}
+
+function updateAnalyticsCards(newStats) {
+    // Update the analytics cards with new data
+    if (newStats.total_revenue !== undefined) {
+        const revenueCard = document.querySelector('.analytics-card:nth-child(1) .analytics-value');
+        if (revenueCard) revenueCard.textContent = '$' + parseFloat(newStats.total_revenue).toFixed(2);
+    }
+    
+    if (newStats.total_bookings !== undefined) {
+        const bookingsCard = document.querySelector('.analytics-card:nth-child(2) .analytics-value');
+        if (bookingsCard) bookingsCard.textContent = newStats.total_bookings;
+    }
+    
+    if (newStats.avg_price !== undefined) {
+        const avgPriceCard = document.querySelector('.analytics-card:nth-child(3) .analytics-value');
+        if (avgPriceCard) avgPriceCard.textContent = '$' + parseFloat(newStats.avg_price).toFixed(2);
+    }
+    
+    if (newStats.active_events !== undefined) {
+        const eventsCard = document.querySelector('.analytics-card:nth-child(4) .analytics-value');
+        if (eventsCard) eventsCard.textContent = newStats.active_events;
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // Create a notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
 </script>
 
 <style>
@@ -321,15 +395,256 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 0.875rem;
 }
 
-.table th {
-    font-weight: 600;
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
 code {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--glass-bg);
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
+    color: var(--text-primary);
+}
+
+.analytics-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    backdrop-filter: blur(20px);
+    transition: var(--transition-smooth);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.analytics-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 94, 26, 0.1), transparent);
+    transition: var(--transition-smooth);
+}
+
+.analytics-card:hover::before {
+    left: 100%;
+}
+
+.analytics-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: var(--shadow-glow);
+    border-color: var(--primary-orange);
+}
+
+.analytics-icon {
+    background: var(--primary-gradient);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-medium);
+    position: relative;
+    z-index: 2;
+}
+
+.analytics-content h5 {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+}
+
+.analytics-value {
+    color: var(--text-primary);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chart-container {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    backdrop-filter: blur(20px);
+    transition: var(--transition-smooth);
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent);
+    transition: var(--transition-smooth);
+    z-index: 1;
+}
+
+.chart-container:hover::before {
+    left: 100%;
+}
+
+.chart-container:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: var(--shadow-glow);
+    border-color: var(--accent-blue);
+}
+
+.chart-container.enhanced {
+    overflow: hidden;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.chart-container.enhanced:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chart-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.chart-image {
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.chart-image:hover {
+    transform: scale(1.02);
+}
+
+.chart-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.chart-full-width {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.chart-full-width .chart-container {
+    max-width: 100%;
+    margin: 0 auto 2rem;
+    min-height: 500px;
+}
+
+.chart-full-width .chart-image {
+    max-height: 500px;
+    object-fit: contain;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.chart-full-width .chart-container:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(255, 94, 26, 0.4);
+}
+
+.admin-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-medium);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.05), transparent);
+    transition: var(--transition-smooth);
+    z-index: 1;
+}
+
+.admin-card:hover::before {
+    left: 100%;
+}
+
+.alert-info {
+    background: var(--glass-bg);
+    border: 1px solid var(--accent-blue);
+    color: var(--text-primary);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius-lg);
+}
+
+.btn-outline-light {
+    border-color: var(--glass-border);
+    color: var(--text-primary);
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    transition: var(--transition-smooth);
+    font-weight: 500;
+}
+
+.btn-outline-light:hover {
+    background: var(--primary-gradient);
+    border-color: var(--primary-orange);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.back-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    transition: var(--transition-smooth);
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.back-btn:hover {
+    background: var(--primary-gradient);
+    border-color: var(--primary-orange);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+    text-decoration: none;
 }
 </style>
 {% endblock %}
