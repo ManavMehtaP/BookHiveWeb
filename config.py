@@ -3,7 +3,7 @@ import os
 class Config:
     MYSQL_HOST = 'localhost'
     MYSQL_USER = 'root'
-    MYSQL_PASSWORD = 'Mnv123*1'
+    MYSQL_PASSWORD = 'SAHIL@2910'
     MYSQL_DB = 'seathive_db'
     MYSQL_CURSORCLASS = 'DictCursor'
     

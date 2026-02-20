@@ -217,17 +217,21 @@ def validate_user_data(user_data):
     elif not re.match(email_patterns['basic'], email):
         errors.append(f"{email_patterns['field_name']} format is invalid")
     phone_rules = {
-        'pattern': r'^[6-9]\d{9}$',
+        'pattern': r'^\d{10,15}$',
         'length': 10,
         'field_name': 'Phone'
     }
     phone = user_data.get('phone', '').strip()
     if not phone:
         errors.append(f"{phone_rules['field_name']} number is required")
-    elif not re.match(phone_rules['pattern'], phone):
-        errors.append(f"{phone_rules['field_name']} must be a valid 10-digit number starting with 6-9")
-    elif len(phone) != phone_rules['length']:
-        errors.append(f"{phone_rules['field_name']} must be exactly {phone_rules['length']} digits")
+    
+    # Flexible phone validation - accepts international formats
+    # Remove spaces, dashes, parentheses, plus signs
+    clean_phone = re.sub(r'[\s\-\(\)\+]', '', phone)
+    if not re.match(phone_rules['pattern'], clean_phone):
+        errors.append(f"{phone_rules['field_name']} must be a valid phone number (10-15 digits)")
+    elif len(clean_phone) < 10:
+        errors.append(f"{phone_rules['field_name']} must be at least 10 digits")
     password_requirements = {
         'min_length': 6,
         'field_name': 'Password'
@@ -400,7 +404,7 @@ def signup():
                     user_data['username'],
                     user_data['email'],
                     user_data['fullname'],
-                    user_data['phone'],
+                    clean_phone,  # Store cleaned phone number
                     user_data['password'],
                     'user'
                 ))
@@ -428,6 +432,14 @@ def signup():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
 @app.route('/logout')
 def logout():
     session.clear()
@@ -662,6 +674,18 @@ def guest_book_event():
         phone = data.get('phone')
         tickets = int(data.get('tickets', 1))
         notes = data.get('notes', '')
+        
+        # Validate phone number format
+        phone = phone.strip()
+        if not phone:
+            return jsonify({'success': False, 'message': 'Phone number is required'})
+        
+        # Flexible phone validation - accepts international formats
+        # Remove spaces, dashes, parentheses, plus signs
+        clean_phone = re.sub(r'[\s\-\(\)\+]', '', phone)
+        if not re.match(r'^\d{10,15}$', clean_phone):
+            return jsonify({'success': False, 'message': 'Invalid phone number format. Please enter a valid phone number (10-15 digits)'})
+        
         if not all([event_id, name, email, phone, tickets]):
             return jsonify({'success': False, 'message': 'Missing required fields'})
         if tickets <= 0:
@@ -685,7 +709,7 @@ def guest_book_event():
                     INSERT INTO bookings (event_id, booking_reference, customer_name, customer_email, 
                                         phone, seats_booked, total_price, booking_status, payment_status, notes)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (event_id, booking_ref, name, email, phone, tickets, tickets * event['price'], 
+                """, (event_id, booking_ref, name, email, clean_phone, tickets, tickets * event['price'], 
                       'active', 'paid', notes))
                 connection.commit()
                 return jsonify({
@@ -772,6 +796,74 @@ def cancel_booking(booking_id):
             })
     finally:
         connection.close()
+@app.route('/api/admin/refresh-charts-live', methods=['POST'])
+@admin_required
+def refresh_charts_live():
+    """Refresh charts with latest database data without full regeneration"""
+    try:
+        # Force refresh by updating chart timestamps
+        import os
+        import time
+        
+        charts_dir = os.path.join('static', 'charts')
+        if os.path.exists(charts_dir):
+            # Update modification time of all chart files to force browser refresh
+            current_time = time.time()
+            for filename in os.listdir(charts_dir):
+                if filename.endswith('.png'):
+                    file_path = os.path.join(charts_dir, filename)
+                    os.utime(file_path, (current_time, current_time))
+        
+        # Get updated stats
+        connection = get_db_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) as total_bookings FROM bookings WHERE booking_status = 'active'")
+                total_bookings = cursor.fetchone()['total_bookings']
+                cursor.execute("SELECT COALESCE(SUM(total_price), 0) as total_revenue FROM bookings WHERE booking_status = 'active'")
+                total_revenue = cursor.fetchone()['total_revenue']
+                cursor.execute("SELECT COUNT(*) as total_events FROM events WHERE status = 'active'")
+                total_events = cursor.fetchone()['total_events']
+                
+                stats = {
+                    'total_bookings': total_bookings,
+                    'total_revenue': float(total_revenue),
+                    'active_events': total_events,
+                    'avg_price': float(total_revenue) / total_bookings if total_bookings > 0 else 0
+                }
+        finally:
+            connection.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Charts refreshed with latest data',
+            'stats': stats,
+            'timestamp': time.time()
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error refreshing charts: {str(e)}'
+        }), 500
+
+@app.route('/api/admin/regenerate-charts', methods=['POST'])
+@admin_required
+def regenerate_charts():
+    """Force regenerate all analytics charts from database"""
+    try:
+        from analytics import generate_all_charts
+        charts = generate_all_charts()
+        return jsonify({
+            'success': True,
+            'message': 'Charts regenerated successfully',
+            'charts_generated': list(charts.keys())
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error generating charts: {str(e)}'
+        }), 500
+
 @app.route('/admin/bookings')
 @admin_required
 def admin_bookings():
@@ -787,7 +879,40 @@ def admin_bookings():
                 ORDER BY b.booking_date DESC
             """)
             bookings = cursor.fetchall()
-            return render_template('admin/bookings.html', bookings=bookings)
+            
+            # Get stats for analytics cards
+            cursor.execute("SELECT COUNT(*) as total_bookings FROM bookings WHERE booking_status = 'active'")
+            total_bookings = cursor.fetchone()['total_bookings']
+            cursor.execute("SELECT COALESCE(SUM(total_price), 0) as total_revenue FROM bookings WHERE booking_status = 'active'")
+            total_revenue = cursor.fetchone()['total_revenue']
+            
+            # Get events for analytics
+            cursor.execute("""
+                SELECT e.*, u.username as created_by_username, u.full_name as created_by_name
+                FROM events e
+                LEFT JOIN users u ON e.created_by = u.id
+                WHERE e.status = 'active' AND (
+                    e.event_date > CURDATE() OR 
+                    (e.event_date = CURDATE() AND e.event_time > CURTIME())
+                )
+                ORDER BY e.event_date ASC, e.event_time ASC
+            """)
+            events = cursor.fetchall()
+            
+            # Generate analytics charts
+            try:
+                from analytics import generate_all_charts
+                charts = generate_all_charts()
+            except Exception as e:
+                print(f"Error generating charts: {e}")
+                charts = {}
+            
+            stats = {
+                'total_bookings': total_bookings,
+                'total_revenue': total_revenue
+            }
+            
+            return render_template('admin/bookings.html', bookings=bookings, charts=charts, stats=stats, events=events)
     finally:
         connection.close()
 @app.route('/api/admin/update-booking-status/<int:booking_id>', methods=['POST'])
